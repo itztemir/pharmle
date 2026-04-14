@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pharmle — Daily Drug Identification Challenge</title>
+<meta name="description" content="Identify the drug from clinical clues in 6 guesses. A daily puzzle for pharmacy students and pharmacists.">
+<meta property="og:title" content="Pharmle — Daily Drug Identification Challenge">
+<meta property="og:description" content="Can you identify today's drug? A Wordle-style game for pharmacists and pharmacy students.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+
+<!-- GOOGLE ADSENSE — replace ca-pub-XXXXXXXXXXXXXXXX with your publisher ID -->
+<!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Luciole:ital,wght@0,400;0,700;1,400;1,700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#0891b2;
+  --teal-dim:#0e7490;
+  --teal-dark:#164e63;
+  --bg:#f0f9ff;
+  --bg2:#e0f2fe;
+  --bg3:#ffffff;
+  --bg4:#f8fafc;
+  --border:#bae6fd;
+  --border2:#7dd3fc;
+  --text:#0c2340;
+  --text-dim:#475569;
+  --text-muted:#94a3b8;
+  --green-bg:#f0fdf4;
+  --green-border:#86efac;
+  --green-text:#166534;
+  --amber-bg:#fffbeb;
+  --amber-border:#fcd34d;
+  --amber-text:#92400e;
+  --red-bg:#fff1f2;
+  --red-border:#fda4af;
+  --red-text:#9f1239;
+  --blue-bg:#eff6ff;
+  --blue-border:#93c5fd;
+  --blue-text:#1e40af;
+}
+
+html,body{background:var(--bg);min-height:100vh;font-family:'Luciole',sans-serif;font-size:15px;color:var(--text);line-height:1.6}
+.page-wrap{max-width:800px;margin:0 auto;padding:0 0 60px}
+
+/* AD */
+.ad-top{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px;text-align:center;min-height:90px;display:flex;align-items:center;justify-content:center}
+.ad-label{font-size:11px;color:#94a3b8;letter-spacing:2px;text-transform:uppercase}
+
+/* HEADER */
+header{background:#fff;border-bottom:3px solid var(--teal);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 12px rgba(8,145,178,.08)}
+.logo{font-family:'DM Serif Display',serif;font-size:30px;color:var(--teal);line-height:1;letter-spacing:-0.5px}
+.logo-rx{color:var(--teal-dim);font-size:18px;vertical-align:super;margin-left:1px}
+.logo-sub{font-size:11px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-top:3px;font-family:'Luciole',sans-serif}
+.hdr-right{text-align:right}
+.daily-badge{font-size:11px;color:var(--teal);letter-spacing:2px;text-transform:uppercase;border:1px solid var(--border2);padding:4px 10px;border-radius:20px;display:inline-block;margin-bottom:6px;background:var(--bg2)}
+.hdr-stats{font-size:12px;color:var(--text-muted);letter-spacing:.5px}
+.hdr-stats b{color:var(--teal)}
+.hdr-links{display:flex;gap:12px;margin-top:6px;justify-content:flex-end}
+.hdr-link{font-size:11px;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;cursor:pointer;padding:2px 0;border-bottom:1px solid transparent;transition:color .15s,border-color .15s}
+.hdr-link:hover{color:var(--teal);border-color:var(--teal-dim)}
+
+/* PROGRESS */
+.prog-bar{height:4px;background:var(--bg2)}
+.prog-fill{height:100%;background:var(--teal);transition:width .5s,background .5s;width:0%}
+
+/* GAME WRAP */
+.game-wrap{padding:0 16px}
+
+/* PATIENT CARD */
+.patient-card{margin:16px 0;background:#fff;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:8px;padding:16px 18px;box-shadow:0 2px 8px rgba(8,145,178,.06)}
+.pc-label{font-size:11px;font-weight:700;color:var(--teal);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.pc-meta{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.pc-badge{font-size:12px;padding:3px 10px;border-radius:20px;border:1px solid var(--border2);color:var(--text-dim);background:var(--bg2)}
+.pc-badge.rx{border-color:var(--teal-dim);color:var(--teal);font-weight:700;background:#e0f2fe}
+.pc-scenario{font-size:14px;color:#334155;line-height:1.75;margin-bottom:14px}
+.finding-row{display:flex;flex-wrap:wrap;gap:6px}
+.finding{font-size:12px;padding:4px 10px;background:var(--bg2);border:1px solid var(--border);color:var(--text-dim);border-radius:20px}
+
+/* CLUES */
+.clue-area{margin:4px 0 8px}
+.clue{display:flex;gap:10px;align-items:flex-start;font-size:13px;margin-bottom:8px;animation:fi .4s ease;background:#fff;border:1px solid var(--border);border-left:3px solid var(--teal-dim);border-radius:6px;padding:8px 12px;box-shadow:0 1px 4px rgba(8,145,178,.05)}
+.clue-arr{color:var(--teal);flex-shrink:0;margin-top:2px}
+.clue-txt{color:#475569;line-height:1.6}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* GUESS GRID */
+.guess-section{margin-bottom:10px}
+.guess-row{display:flex;gap:4px;margin-bottom:5px;align-items:stretch}
+.gnum{font-size:12px;color:#cbd5e1;width:18px;text-align:right;flex-shrink:0;font-weight:700}
+.tile{flex:1;padding:8px 3px;text-align:center;font-size:9.5px;font-family:'Luciole',sans-serif;border-radius:6px;border:1px solid #e2e8f0;background:#f8fafc;color:#475569;text-transform:uppercase;overflow:hidden;white-space:normal;word-break:break-word;min-width:0;transition:all .3s;line-height:1.4;min-height:44px;display:flex;align-items:center;justify-content:center}
+.tile.lbl{color:#94a3b8;font-size:9px}
+.tile.correct{background:var(--green-bg);border-color:var(--green-border);color:var(--green-text);font-weight:700}
+.tile.close{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber-text);font-weight:700}
+.tile.partial{background:var(--blue-bg);border-color:var(--blue-border);color:var(--blue-text);font-weight:700}
+.tile.wrong{background:var(--red-bg);border-color:var(--red-border);color:var(--red-text);font-weight:700}
+
+/* LEGEND */
+.legend{display:flex;gap:16px;padding:10px 0 12px;flex-wrap:wrap;border-top:1px solid var(--border);margin-top:6px}
+.li{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);letter-spacing:.5px}
+.ld{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+/* INPUT */
+.input-row{display:flex;gap:10px;margin:12px 0}
+select.ds{flex:1;background:#fff;border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Luciole',sans-serif;font-size:13px;padding:11px 14px;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none}
+select.ds:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(8,145,178,.1)}
+select.ds:disabled{opacity:.4;cursor:default}
+button.go{background:var(--teal);border:none;border-radius:8px;color:#fff;font-family:'DM Serif Display',serif;font-size:18px;letter-spacing:1px;padding:11px 24px;cursor:pointer;transition:background .15s;flex-shrink:0}
+button.go:hover{background:var(--teal-dim)}
+button.go:disabled{background:#e2e8f0;color:#94a3b8;cursor:default}
+
+/* RESULT */
+.result{padding:20px;border-radius:8px;display:none;text-align:center;margin:8px 0}
+.result.win{display:block;background:var(--green-bg);border:1px solid var(--green-border)}
+.result.lose{display:block;background:var(--red-bg);border:1px solid var(--red-border)}
+.result-title{font-family:'DM Serif Display',serif;font-size:26px;letter-spacing:.5px}
+.result.win .result-title{color:var(--green-text)}
+.result.lose .result-title{color:#be123c}
+.result-answer{font-size:14px;color:var(--text-dim);margin-top:8px;line-height:1.7}
+.result-answer b{color:var(--text)}
+.result-countdown{font-size:12px;color:var(--text-muted);margin-top:10px;letter-spacing:1px}
+.result-countdown b{color:var(--teal);font-size:18px;font-family:'DM Serif Display',serif}
+.btn-row{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.share-btn{background:var(--teal);border:none;border-radius:8px;color:#fff;font-family:'DM Serif Display',serif;font-size:17px;padding:10px 26px;cursor:pointer;transition:background .15s}
+.share-btn:hover{background:var(--teal-dim)}
+.share-btn.copied{background:#166534;color:#f0fdf4}
+
+/* MID AD */
+.ad-mid{background:var(--bg2);border:1px dashed var(--border2);border-radius:8px;padding:24px;text-align:center;min-height:100px;display:flex;align-items:center;justify-content:center;margin:16px 0}
+
+/* FOOTER */
+footer{margin-top:40px;padding:24px 20px;border-top:1px solid var(--border);text-align:center;font-size:12px;color:var(--text-muted);letter-spacing:.5px;line-height:2.2}
+footer a{color:#7dd3fc;text-decoration:none}
+footer a:hover{color:var(--teal)}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(12,35,64,.7);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border:1px solid var(--border);border-top:4px solid var(--teal);border-radius:10px;padding:28px;max-width:440px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(8,145,178,.15)}
+.modal h2{font-family:'DM Serif Display',serif;font-size:24px;color:var(--teal);margin-bottom:16px}
+.modal p{font-size:13px;color:var(--text-dim);line-height:1.85;margin-bottom:12px}
+.modal-close{background:transparent;border:1px solid var(--border2);border-radius:6px;color:var(--text-muted);font-family:'DM Serif Display',serif;font-size:16px;padding:8px 20px;cursor:pointer;margin-top:12px}
+.modal-close:hover{border-color:var(--teal);color:var(--teal)}
+.how-item{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start}
+.how-num{font-family:'DM Serif Display',serif;font-size:22px;color:var(--teal);flex-shrink:0;line-height:1.2}
+
+/* TOAST */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--teal-dark);border-radius:8px;color:#fff;font-size:13px;padding:12px 24px;opacity:0;transition:all .3s;z-index:300;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:520px){
+  .tile{font-size:8px;padding:6px 2px;min-height:40px}
+  .logo{font-size:24px}
+  button.go{padding:11px 16px;font-size:16px}
+  .game-wrap{padding:0 10px}
+  header{padding:12px 14px}
+}
+</style>
+</head>
+<body>
+
+<div class="ad-top">
+  <!-- ADSENSE SLOT
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="1234567890" data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  -->
+  <span class="ad-label">advertisement</span>
+</div>
+
+<div class="page-wrap">
+
+<header>
+  <div>
+    <div class="logo">Pharmle<span class="logo-rx">Rx</span></div>
+    <div class="logo-sub">Daily Drug Identification Challenge</div>
+  </div>
+  <div class="hdr-right">
+    <div class="daily-badge" id="daily-badge">Case #1</div>
+    <div class="hdr-stats">Streak <b id="st">0</b> &nbsp;·&nbsp; Solved <b id="sv">0</b> &nbsp;·&nbsp; Best <b id="bst">—</b></div>
+    <div class="hdr-links">
+      <span class="hdr-link" onclick="openModal('how')">How to play</span>
+      <span class="hdr-link" onclick="openModal('stats')">Stats</span>
+    </div>
+  </div>
+</header>
+
+<div class="prog-bar"><div class="prog-fill" id="pf"></div></div>
+
+<div class="game-wrap">
+
+  <div class="patient-card">
+    <div class="pc-label">Patient Case — Today's Drug</div>
+    <div class="pc-meta" id="pc-meta"></div>
+    <div class="pc-scenario" id="pc-sc"></div>
+    <div class="pc-label">Clinical Findings</div>
+    <div class="finding-row" id="pc-findings"></div>
+  </div>
+
+  <div class="clue-area" id="clue-area"></div>
+  <div class="guess-section" id="guess-area"></div>
+
+  <div class="result" id="result">
+    <div class="result-title" id="rt"></div>
+    <div class="result-answer" id="ra"></div>
+    <div class="result-countdown">Next case in <b id="countdown">00:00:00</b></div>
+    <div class="btn-row">
+      <button class="share-btn" id="share-btn" onclick="share()">Share Result</button>
+    </div>
+  </div>
+
+  <div class="input-row" id="input-row">
+    <select class="ds" id="ds"><option value="">— Identify the drug —</option></select>
+    <button class="go" id="go" onclick="submitGuess()">Dispense</button>
+  </div>
+
+  <div class="legend">
+    <div class="li"><div class="ld" style="background:var(--green-border)"></div>Exact match</div>
+    <div class="li"><div class="ld" style="background:var(--amber-border)"></div>Close / overlaps</div>
+    <div class="li"><div class="ld" style="background:var(--blue-border)"></div>Same drug family</div>
+    <div class="li"><div class="ld" style="background:var(--red-border)"></div>No match</div>
+  </div>
+
+  <div class="ad-mid">
+    <!-- ADSENSE SLOT
+    <ins class="adsbygoogle" style="display:inline-block;width:300px;height:250px" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="0987654321"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    -->
+    <span class="ad-label">advertisement</span>
+  </div>
+
+</div>
+
+<footer>
+  <div>Pharmle<sup>Rx</sup> — A daily drug identification puzzle for pharmacy students &amp; pharmacists</div>
+  <div style="margin-top:6px">
+    <a href="#" onclick="openModal('about');return false">About</a> &nbsp;·&nbsp;
+    <a href="mailto:hello@pharmle.com">Contact</a> &nbsp;·&nbsp;
+    <a href="#" onclick="openModal('privacy');return false">Privacy</a>
+  </div>
+  <div style="margin-top:10px;color:#cbd5e1">New case every day at midnight UTC</div>
+</footer>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- HOW TO PLAY -->
+<div class="modal-bg" id="modal-how">
+  <div class="modal">
+    <h2>How to Play</h2>
+    <div class="how-item"><div class="how-num">1</div><p>Read the patient case — age, condition, and clinical presentation are all clues to the drug being used.</p></div>
+    <div class="how-item"><div class="how-num">2</div><p>Select your drug from the dropdown and press <b>Dispense</b>. You have <b style="color:var(--teal)">6 attempts</b> to identify the correct medication.</p></div>
+    <div class="how-item"><div class="how-num">3</div><p>After each wrong guess, a new pharmacology clue is revealed — mechanism, side effects, interactions, or lab findings.</p></div>
+    <div class="how-item"><div class="how-num">4</div><p>The tile grid compares your guess across 8 dimensions: Drug Class, Sub-class, Mechanism, Indication, Route, Monitoring, Side Effect Profile, and Controlled Status.</p></div>
+    <p><span style="color:var(--green-text)">■</span> Green = exact &nbsp;<span style="color:var(--amber-text)">■</span> Amber = close &nbsp;<span style="color:var(--blue-text)">■</span> Blue = same family &nbsp;<span style="color:var(--red-text)">■</span> Red = wrong</p>
+    <p>A new case drops every day at midnight UTC.</p>
+    <button class="modal-close" onclick="closeModal('how')">Got it</button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="modal-bg" id="modal-stats">
+  <div class="modal">
+    <h2>Your Stats</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:16px" id="stats-grid"></div>
+    <p style="font-size:11px;color:#94a3b8">Stats are saved locally in your browser.</p>
+    <button class="modal-close" onclick="closeModal('stats')">Close</button>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="modal-bg" id="modal-about">
+  <div class="modal">
+    <h2>About Pharmle</h2>
+    <p>Pharmle is a daily drug identification puzzle for pharmacy students, pharmacists, and healthcare professionals. Each day presents a real-world patient case — your job is to identify the medication from clinical and pharmacological clues.</p>
+    <p>Cases cover common drug classes seen in practice — from cardiovascular and endocrine to psychiatry and infectious disease. Difficulty is calibrated for pharmacy students and techs, with enough nuance to challenge working pharmacists.</p>
+    <p>New case every day at midnight UTC.</p>
+    <button class="modal-close" onclick="closeModal('about')">Close</button>
+  </div>
+</div>
+
+<!-- PRIVACY -->
+<div class="modal-bg" id="modal-privacy">
+  <div class="modal">
+    <h2>Privacy</h2>
+    <p>Pharmle stores your game stats locally in your browser using localStorage. No personal data is collected or transmitted.</p>
+    <p>This site uses Google AdSense to display advertisements. Google may use cookies to serve ads. See <a href="https://policies.google.com/privacy" target="_blank" style="color:var(--teal)">Google's Privacy Policy</a> for details.</p>
+    <p>You can opt out via <a href="https://www.google.com/settings/ads" target="_blank" style="color:var(--teal)">Google Ad Settings</a>.</p>
+    <button class="modal-close" onclick="closeModal('privacy')">Close</button>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// PUZZLES
+// ================================================================
+const PUZZLES=[
+{
+  drug:"Metformin",
+  class:"Antidiabetic",
+  scenario:"A 52-year-old overweight man with newly diagnosed type 2 diabetes presents for medication initiation. HbA1c is 8.2%. Renal function is normal. His physician wants to avoid hypoglycemia and weight gain. He has no heart failure or liver disease.",
+  meta:{age:"Middle-aged adult",condition:"Type 2 Diabetes",route:"Oral",drugClass:"Biguanide",subClass:"Antidiabetic",mechanism:"AMPK activation / hepatic glucose reduction",indication:"T2DM first-line",monitoring:"Renal function / B12 levels",sideEffect:"GI upset / lactic acidosis risk",controlled:"No"},
+  findings:["HbA1c 8.2%","Overweight BMI","Normal renal function","No hypoglycemia risk","First-line therapy"],
+  clues:[
+    "Mechanism: decreases hepatic glucose production and improves insulin sensitivity via AMPK pathway",
+    "Key contraindication: eGFR <30 mL/min — hold before IV contrast procedures",
+    "Common side effects: nausea, diarrhoea, metallic taste — take with food to reduce GI upset",
+    "Long-term use associated with vitamin B12 malabsorption — monitor annually"
+  ]
+},
+{
+  drug:"Lisinopril",
+  class:"Antihypertensive",
+  scenario:"A 61-year-old woman with hypertension and diabetic nephropathy. Her BP is 148/92 mmHg and she has microalbuminuria. Potassium is 4.1 mEq/L. Her physician specifically wants a drug that provides renal protection in addition to blood pressure control.",
+  meta:{age:"Older adult",condition:"Hypertension / Diabetic Nephropathy",route:"Oral",drugClass:"ACE Inhibitor",subClass:"Antihypertensive",mechanism:"Angiotensin converting enzyme inhibition",indication:"HTN + renoprotection",monitoring:"K+ / Cr / BP",sideEffect:"Dry cough / angioedema",controlled:"No"},
+  findings:["BP 148/92","Microalbuminuria","Diabetic nephropathy","Normal potassium","Renoprotection goal"],
+  clues:[
+    "Class: ACE inhibitor — blocks conversion of angiotensin I to angiotensin II, reducing aldosterone and BP",
+    "Preferred in diabetic nephropathy due to reduction of intraglomerular pressure and proteinuria",
+    "Most common side effect: persistent dry cough (bradykinin accumulation) — switch to ARB if intolerable",
+    "Serious risk: angioedema — discontinue immediately; contraindicated in pregnancy (teratogenic)"
+  ]
+},
+{
+  drug:"Atorvastatin",
+  class:"Lipid-lowering",
+  scenario:"A 58-year-old man with a recent myocardial infarction. LDL is 142 mg/dL. His cardiologist wants high-intensity lipid lowering therapy to reduce LDL by at least 50%. He is otherwise healthy with normal liver enzymes.",
+  meta:{age:"Older adult",condition:"Post-MI / Dyslipidaemia",route:"Oral",drugClass:"Statin",subClass:"Lipid-lowering",mechanism:"HMG-CoA reductase inhibition",indication:"High-intensity lipid lowering",monitoring:"LFTs / CK / lipid panel",sideEffect:"Myopathy / rhabdomyolysis",controlled:"No"},
+  findings:["LDL 142 mg/dL","Recent MI","High-intensity goal","Normal LFTs","Secondary prevention"],
+  clues:[
+    "Mechanism: inhibits HMG-CoA reductase — rate-limiting enzyme in cholesterol biosynthesis",
+    "High-intensity statin: reduces LDL by ≥50% — preferred post-ACS for secondary prevention",
+    "Key interaction: avoid with strong CYP3A4 inhibitors (e.g. clarithromycin) — increases myopathy risk",
+    "Side effects: myalgia, elevated CK — rare but serious: rhabdomyolysis; check CK if muscle pain"
+  ]
+},
+{
+  drug:"Amoxicillin",
+  class:"Antibiotic",
+  scenario:"A 28-year-old woman with no drug allergies presents with a 3-day history of sore throat, fever 38.8°C, tonsillar exudates, and tender anterior cervical lymphadenopathy. Rapid strep test is positive. She needs a standard first-line antibiotic course.",
+  meta:{age:"Young adult",condition:"Streptococcal Pharyngitis",route:"Oral",drugClass:"Penicillin",subClass:"Antibiotic",mechanism:"Beta-lactam / cell wall synthesis inhibition",indication:"Group A Strep infection",monitoring:"Allergy history",sideEffect:"Rash / diarrhoea",controlled:"No"},
+  findings:["Positive strep test","Tonsillar exudates","Fever 38.8°C","No penicillin allergy","First-line therapy"],
+  clues:[
+    "Class: aminopenicillin — beta-lactam antibiotic with broad gram-positive and some gram-negative coverage",
+    "First-line for Group A Streptococcal pharyngitis per IDSA guidelines — 10-day course",
+    "Common side effects: GI upset, diarrhoea; maculopapular rash (not true allergy in most cases)",
+    "Caution: if Epstein-Barr virus (mono) suspected — amoxicillin causes characteristic widespread rash"
+  ]
+},
+{
+  drug:"Sertraline",
+  class:"Antidepressant",
+  scenario:"A 34-year-old woman presents with a 3-month history of low mood, anhedonia, poor sleep, and fatigue. PHQ-9 score is 16 (moderately severe). She has no cardiac history. Her physician wants to start a first-line antidepressant with a favourable side-effect profile and low drug interaction potential.",
+  meta:{age:"Young adult",condition:"Major Depressive Disorder",route:"Oral",drugClass:"SSRI",subClass:"Antidepressant",mechanism:"Serotonin reuptake inhibition",indication:"Depression / Anxiety",monitoring:"Mood / suicidality / serotonin syndrome",sideEffect:"Sexual dysfunction / GI / insomnia",controlled:"No"},
+  findings:["PHQ-9 score 16","Anhedonia","Sleep disturbance","No cardiac history","First-line antidepressant"],
+  clues:[
+    "Class: selective serotonin reuptake inhibitor (SSRI) — most widely prescribed antidepressant class",
+    "Considered first-line for MDD and multiple anxiety disorders; generally well tolerated",
+    "Common early side effects: nausea, insomnia — usually resolve after 1–2 weeks",
+    "Black box warning: increased suicidality risk in patients <25 — monitor closely in first weeks"
+  ]
+},
+{
+  drug:"Warfarin",
+  class:"Anticoagulant",
+  scenario:"A 70-year-old man with atrial fibrillation and a mechanical heart valve. He requires long-term anticoagulation. His physician notes this is one of the few situations where a specific older anticoagulant remains preferred over newer agents. INR target is 2.5–3.5.",
+  meta:{age:"Older adult",condition:"AF / Mechanical Heart Valve",route:"Oral",drugClass:"Vitamin K Antagonist",subClass:"Anticoagulant",mechanism:"Vitamin K epoxide reductase inhibition",indication:"AF / VTE / Mechanical valve",monitoring:"INR / diet / interactions",sideEffect:"Bleeding / bruising / teratogenic",controlled:"No"},
+  findings:["Atrial fibrillation","Mechanical heart valve","INR target 2.5–3.5","Long-term anticoagulation","DOAC not suitable"],
+  clues:[
+    "Mechanism: inhibits vitamin K epoxide reductase — reduces synthesis of clotting factors II, VII, IX, X",
+    "DOACs (rivaroxaban, apixaban) are contraindicated with mechanical heart valves — this drug remains standard",
+    "Numerous drug and food interactions — vitamin K-rich foods (leafy greens) affect INR significantly",
+    "Antidote: vitamin K (slow reversal), 4-factor PCC or FFP for rapid reversal in bleeding emergency"
+  ]
+},
+{
+  drug:"Salbutamol",
+  class:"Bronchodilator",
+  scenario:"A 19-year-old university student with known asthma presents with acute wheeze and chest tightness triggered by exercise. Peak flow is 65% of predicted. She needs a rapid-onset inhaled reliever to use on an as-needed basis during acute symptoms.",
+  meta:{age:"Young adult",condition:"Asthma (acute)",route:"Inhaled",drugClass:"SABA",subClass:"Bronchodilator",mechanism:"Beta-2 adrenergic agonism",indication:"Acute bronchospasm / Asthma rescue",monitoring:"Heart rate / K+ with high doses",sideEffect:"Tremor / tachycardia / hypokalaemia",controlled:"No"},
+  findings:["Peak flow 65%","Exercise-triggered","Acute wheeze","Known asthma","Rescue inhaler needed"],
+  clues:[
+    "Class: short-acting beta-2 agonist (SABA) — causes bronchial smooth muscle relaxation within minutes",
+    "Onset: 3–5 minutes; duration: 4–6 hours — used as rescue reliever, not maintenance therapy",
+    "Side effects: tremor, palpitations, tachycardia — high doses can cause hypokalaemia",
+    "Also known as Albuterol in North America — same drug, different INN vs USAN naming"
+  ]
+},
+{
+  drug:"Omeprazole",
+  class:"GI Agent",
+  scenario:"A 45-year-old man on long-term NSAIDs for rheumatoid arthritis presents with epigastric pain and heartburn. Endoscopy shows gastric erosions. His rheumatologist wants to add gastroprotective therapy to allow continuation of NSAID treatment.",
+  meta:{age:"Middle-aged adult",condition:"NSAID-induced gastric erosions / GORD",route:"Oral",drugClass:"Proton Pump Inhibitor",subClass:"GI Agent",mechanism:"H+/K+ ATPase inhibition",indication:"PUD / GORD / gastroprotection",monitoring:"Mg2+ / B12 long-term",sideEffect:"Hypomagnesaemia / C.diff risk / B12 deficiency",controlled:"No"},
+  findings:["NSAID use","Gastric erosions","Epigastric pain","Gastroprotection needed","Long-term therapy"],
+  clues:[
+    "Class: proton pump inhibitor (PPI) — most potent class of acid suppression available",
+    "Mechanism: irreversibly binds H+/K+ ATPase (proton pump) on gastric parietal cells",
+    "First-line for NSAID-associated gastroprotection, GORD, H. pylori eradication regimens",
+    "Long-term risks: hypomagnesaemia, vitamin B12 deficiency, increased C. difficile susceptibility"
+  ]
+},
+{
+  drug:"Levothyroxine",
+  class:"Thyroid Agent",
+  scenario:"A 42-year-old woman presents with fatigue, weight gain, cold intolerance, constipation, and dry skin. TSH is 18.4 mIU/L and free T4 is low. She is diagnosed with primary hypothyroidism and requires thyroid hormone replacement therapy.",
+  meta:{age:"Middle-aged adult",condition:"Primary Hypothyroidism",route:"Oral",drugClass:"Thyroid Hormone",subClass:"Thyroid Agent",mechanism:"Exogenous T4 replacement",indication:"Hypothyroidism",monitoring:"TSH / free T4 / cardiac symptoms",sideEffect:"Cardiac / osteoporosis if over-replaced",controlled:"No"},
+  findings:["TSH 18.4 mIU/L","Low free T4","Weight gain","Cold intolerance","Fatigue"],
+  clues:[
+    "Synthetic T4 (thyroxine) — peripheral conversion to active T3 occurs in target tissues",
+    "Take 30–60 minutes before food on an empty stomach — many drugs reduce absorption (calcium, iron, PPIs)",
+    "Dose adjusted by TSH monitoring every 6–8 weeks until stable, then annually",
+    "Over-replacement causes iatrogenic hyperthyroidism — risk of atrial fibrillation and osteoporosis"
+  ]
+},
+{
+  drug:"Furosemide",
+  class:"Diuretic",
+  scenario:"A 68-year-old man with decompensated heart failure presents with severe bilateral leg oedema, orthopnoea, and crackles at lung bases. BNP is markedly elevated. His physician wants a rapid-acting diuretic for acute decongestion, initially IV then oral.",
+  meta:{age:"Older adult",condition:"Acute Decompensated Heart Failure",route:"IV / Oral",drugClass:"Loop Diuretic",subClass:"Diuretic",mechanism:"Na-K-2Cl cotransporter inhibition (Loop of Henle)",indication:"Heart failure / oedema / hypertension",monitoring:"Electrolytes / renal function / BP",sideEffect:"Hypokalaemia / hyponatraemia / ototoxicity",controlled:"No"},
+  findings:["Bilateral oedema","Orthopnoea","Elevated BNP","Pulmonary crackles","Acute decongestion"],
+  clues:[
+    "Class: loop diuretic — acts on the ascending loop of Henle, most potent diuretic class",
+    "Inhibits Na-K-2Cl cotransporter — produces rapid, large-volume diuresis",
+    "Key electrolyte effects: hypokalaemia, hyponatraemia, hypomagnesaemia — monitor closely",
+    "High-dose IV risk: ototoxicity (hearing loss) — especially with concurrent aminoglycosides"
+  ]
+},
+{
+  drug:"Metoprolol",
+  class:"Antihypertensive",
+  scenario:"A 55-year-old man with stable angina, hypertension, and a previous MI 2 years ago. Resting heart rate is 88 bpm. His cardiologist wants a cardioselective beta-blocker for rate control, angina management, and secondary prevention of future cardiac events.",
+  meta:{age:"Middle-aged adult",condition:"Angina / Post-MI / HTN",route:"Oral",drugClass:"Beta Blocker",subClass:"Antihypertensive",mechanism:"Beta-1 selective adrenergic blockade",indication:"Angina / HTN / Post-MI / HF",monitoring:"HR / BP / blood glucose masking",sideEffect:"Bradycardia / fatigue / cold extremities",controlled:"No"},
+  findings:["Stable angina","HR 88 bpm","Previous MI","Hypertension","Cardioselective needed"],
+  clues:[
+    "Class: cardioselective beta-1 blocker — at therapeutic doses, relatively selective for cardiac beta-1 receptors",
+    "Reduces heart rate, myocardial oxygen demand, and BP — first-line for stable angina and post-MI",
+    "Do not abruptly discontinue — rebound tachycardia and angina risk; taper over 1–2 weeks",
+    "Masks hypoglycaemic symptoms (tachycardia) in diabetics — use with caution; still usable in COPD at low doses"
+  ]
+},
+{
+  drug:"Amlodipine",
+  class:"Antihypertensive",
+  scenario:"A 63-year-old woman with hypertension and Raynaud's phenomenon. Previous beta-blocker was discontinued due to worsening of her cold hands. Her physician wants a long-acting antihypertensive that also helps vasospasm. She has no heart failure.",
+  meta:{age:"Older adult",condition:"Hypertension / Raynaud's",route:"Oral",drugClass:"Calcium Channel Blocker",subClass:"Antihypertensive",mechanism:"L-type calcium channel blockade (vascular)",indication:"HTN / Angina / Raynaud's",monitoring:"BP / ankle oedema / HR",sideEffect:"Peripheral oedema / flushing / headache",controlled:"No"},
+  findings:["Hypertension","Raynaud's phenomenon","Beta-blocker intolerant","No heart failure","Vasospasm"],
+  clues:[
+    "Class: dihydropyridine calcium channel blocker — acts primarily on vascular smooth muscle",
+    "Long half-life (~35–50 hours) — once daily dosing, smooth BP control without reflex tachycardia",
+    "Beneficial in Raynaud's — peripheral vasodilation reduces vasospasm frequency and severity",
+    "Most common side effect: peripheral oedema (ankle swelling) — due to precapillary vasodilation"
+  ]
+},
+{
+  drug:"Prednisolone",
+  class:"Corticosteroid",
+  scenario:"A 38-year-old woman with a severe acute asthma exacerbation not responding to bronchodilators alone. She also has a known flare of her rheumatoid arthritis. Her physician prescribes a short course of systemic corticosteroid to manage both conditions simultaneously.",
+  meta:{age:"Young adult",condition:"Acute Asthma / RA Flare",route:"Oral",drugClass:"Corticosteroid",subClass:"Anti-inflammatory",mechanism:"Glucocorticoid receptor agonism",indication:"Asthma / RA / inflammatory conditions",monitoring:"Blood glucose / BP / bone density",sideEffect:"Hyperglycaemia / immunosuppression / osteoporosis",controlled:"No"},
+  findings:["Acute asthma","RA flare","SABA-refractory","Short course","Systemic anti-inflammatory"],
+  clues:[
+    "Class: systemic corticosteroid — broad anti-inflammatory and immunosuppressive effects",
+    "For acute asthma: reduces airway inflammation, speeds recovery — give early in exacerbation",
+    "Short-course side effects: hyperglycaemia, mood changes, insomnia, fluid retention",
+    "Long-term risks: adrenal suppression, osteoporosis, cataracts, Cushing's syndrome — never stop abruptly"
+  ]
+},
+{
+  drug:"Codeine",
+  class:"Analgesic",
+  scenario:"A 40-year-old man with a dry, persistent cough and mild pain following a rib injury. He has no respiratory depression history. His GP considers a weak opioid with antitussive properties for short-term relief. He is not on any MAOIs.",
+  meta:{age:"Middle-aged adult",condition:"Mild pain / Cough",route:"Oral",drugClass:"Opioid",subClass:"Analgesic",mechanism:"Mu-opioid receptor agonism (prodrug)",indication:"Mild-moderate pain / Cough suppression",monitoring:"Respiratory rate / CYP2D6 status",sideEffect:"Constipation / drowsiness / dependence",controlled:"Yes — Schedule 5/CD"},
+  findings:["Dry cough","Rib injury","Mild-moderate pain","Short-term use","Not on MAOIs"],
+  clues:[
+    "Prodrug: converted to morphine by CYP2D6 — ultra-rapid metabolisers risk opioid toxicity",
+    "Antitussive properties at lower doses — suppresses cough reflex centrally",
+    "Contraindicated in children under 12 and breastfeeding — FDA and MHRA warnings issued",
+    "Controlled drug — dependence potential; avoid in CYP2D6 ultra-rapid metabolisers"
+  ]
+},
+{
+  drug:"Insulin Glargine",
+  class:"Antidiabetic",
+  scenario:"A 55-year-old man with type 1 diabetes requiring basal insulin coverage. His fasting glucose levels are consistently elevated at 11–14 mmol/L. His endocrinologist wants a long-acting insulin with a peakless, 24-hour profile to provide stable overnight coverage.",
+  meta:{age:"Middle-aged adult",condition:"Type 1 Diabetes",route:"Subcutaneous",drugClass:"Long-acting Insulin",subClass:"Antidiabetic",mechanism:"Insulin receptor agonism (basal)",indication:"T1DM / T2DM basal coverage",monitoring:"Blood glucose / HbA1c / injection sites",sideEffect:"Hypoglycaemia / lipohypertrophy / weight gain",controlled:"No"},
+  findings:["Type 1 diabetes","Fasting glucose 11–14 mmol/L","Basal coverage needed","Peakless profile","Once daily injection"],
+  clues:[
+    "Long-acting insulin analogue — modified to precipitate at physiological pH, releasing slowly",
+    "Peakless action profile over ~24 hours — reduces risk of nocturnal hypoglycaemia vs NPH",
+    "Do NOT mix with other insulins in the same syringe — precipitation occurs",
+    "Injection site rotation essential — lipohypertrophy impairs absorption and glucose control"
+  ]
+},
+{
+  drug:"Trimethoprim",
+  class:"Antibiotic",
+  scenario:"A 24-year-old woman presents with dysuria, urinary frequency, and suprapubic discomfort for 2 days. No fever or flank pain. Urinalysis shows nitrites and leucocytes. She has no drug allergies and no history of resistant organisms. Simple lower UTI.",
+  meta:{age:"Young adult",condition:"Uncomplicated UTI",route:"Oral",drugClass:"Folate Antagonist",subClass:"Antibiotic",mechanism:"Dihydrofolate reductase inhibition",indication:"Uncomplicated UTI",monitoring:"Renal function / FBC long-term",sideEffect:"Rash / hyperkalaemia / folate interaction",controlled:"No"},
+  findings:["Dysuria","Urinary frequency","Nitrites positive","Leucocytes on UA","Uncomplicated UTI"],
+  clues:[
+    "Mechanism: inhibits dihydrofolate reductase — blocks bacterial folate synthesis, bacteriostatic",
+    "First-line for uncomplicated lower UTI in many guidelines — 7-day course in women",
+    "Avoid in first trimester of pregnancy — folate antagonism risk to developing fetus",
+    "Can raise serum creatinine without true renal impairment — blocks tubular secretion of creatinine"
+  ]
+},
+{
+  drug:"Diazepam",
+  class:"Anxiolytic",
+  scenario:"A 32-year-old man presents to ED with a generalised tonic-clonic seizure that has been ongoing for 4 minutes. He has a history of epilepsy. IV access is being established. Immediate pharmacological termination of the seizure is required.",
+  meta:{age:"Young adult",condition:"Status Epilepticus",route:"IV / PR / Buccal",drugClass:"Benzodiazepine",subClass:"Anxiolytic",mechanism:"GABA-A receptor positive allosteric modulation",indication:"Seizures / Anxiety / Alcohol withdrawal",monitoring:"Respiratory rate / sedation / BP",sideEffect:"Respiratory depression / sedation / dependence",controlled:"Yes — Schedule 4 CD"},
+  findings:["Active seizure >3 min","Known epilepsy","Immediate termination","IV access","First-line emergency"],
+  clues:[
+    "Class: benzodiazepine — enhances effect of GABA at GABA-A receptor, producing CNS depression",
+    "First-line for acute seizure termination — acts within minutes IV",
+    "Respiratory depression risk — resuscitation equipment must be available when giving IV",
+    "Tolerance and dependence develop with regular use — not for long-term seizure prevention"
+  ]
+},
+{
+  drug:"Ramipril",
+  class:"Antihypertensive",
+  scenario:"A 65-year-old man with heart failure with reduced ejection fraction (HFrEF), EF 35%. BP is 130/80. He has no renal impairment or hyperkalaemia. His cardiologist wants to start a neurohormonal agent proven to reduce mortality in heart failure.",
+  meta:{age:"Older adult",condition:"Heart Failure with Reduced EF",route:"Oral",drugClass:"ACE Inhibitor",subClass:"Antihypertensive",mechanism:"Angiotensin converting enzyme inhibition",indication:"HFrEF / HTN / Post-MI",monitoring:"K+ / Cr / BP",sideEffect:"Dry cough / angioedema / hypotension",controlled:"No"},
+  findings:["HFrEF EF 35%","BP 130/80","Normal renal function","Normal potassium","Mortality reduction goal"],
+  clues:[
+    "ACE inhibitor — evidence-based therapy for HFrEF; reduces preload, afterload, and neurohormonal activation",
+    "Proven mortality benefit in heart failure and post-MI — start low, titrate slowly",
+    "First-dose hypotension risk — take first dose at bedtime; monitor BP closely",
+    "Dry cough in ~10–15% (bradykinin) — switch to ARB (e.g. candesartan) if not tolerated"
+  ]
+},
+{
+  drug:"Allopurinol",
+  class:"Gout Agent",
+  scenario:"A 58-year-old obese man with recurrent gout attacks, most recently in his first metatarsophalangeal joint. Serum uric acid is 520 mmol/L. The acute attack has now settled. His physician wants to start long-term urate-lowering therapy to prevent future attacks.",
+  meta:{age:"Middle-aged adult",condition:"Chronic Gout / Hyperuricaemia",route:"Oral",drugClass:"Xanthine Oxidase Inhibitor",subClass:"Gout Agent",mechanism:"Xanthine oxidase inhibition",indication:"Gout prophylaxis / Hyperuricaemia",monitoring:"Uric acid / renal function / FBC",sideEffect:"Rash / SJS / gout flare on initiation",controlled:"No"},
+  findings:["Recurrent gout","Uric acid 520 mmol/L","Acute attack resolved","Long-term prophylaxis","First MTP joint"],
+  clues:[
+    "Mechanism: inhibits xanthine oxidase — reduces uric acid synthesis",
+    "Start AFTER acute attack resolves — initiating during acute gout can prolong or worsen the attack",
+    "Cover with colchicine or NSAID for 3–6 months on initiation to prevent flares",
+    "Serious risk: Stevens-Johnson syndrome — especially in HLA-B*5801 carriers (South-East Asian populations)"
+  ]
+},
+{
+  drug:"Clopidogrel",
+  class:"Antiplatelet",
+  scenario:"A 62-year-old man had a drug-eluting coronary stent placed 3 days ago following an NSTEMI. He is already on aspirin. His cardiologist starts dual antiplatelet therapy for 12 months to prevent in-stent thrombosis. He has no active bleeding.",
+  meta:{age:"Older adult",condition:"Post-PCI / NSTEMI",route:"Oral",drugClass:"P2Y12 Inhibitor",subClass:"Antiplatelet",mechanism:"ADP receptor (P2Y12) irreversible blockade",indication:"ACS / Post-PCI / Stroke prevention",monitoring:"Bleeding / CYP2C19 status",sideEffect:"Bleeding / bruising / TTP (rare)",controlled:"No"},
+  findings:["Drug-eluting stent","Post-NSTEMI","On aspirin","DAPT 12 months","Bleeding risk acceptable"],
+  clues:[
+    "Class: P2Y12 ADP receptor antagonist — irreversibly inhibits platelet aggregation",
+    "Prodrug requiring CYP2C19 activation — poor metabolisers have reduced efficacy (consider prasugrel/ticagrelor)",
+    "Dual antiplatelet therapy with aspirin reduces stent thrombosis and recurrent MI risk significantly",
+    "PPIs (esp. omeprazole) may reduce efficacy via CYP2C19 competition — use pantoprazole if needed"
+  ]
+},
+{
+  drug:"Amitriptyline",
+  class:"Antidepressant",
+  scenario:"A 45-year-old woman with chronic neuropathic pain from diabetic peripheral neuropathy. She also reports disturbed sleep. Her physician wants a drug with dual benefit — neuropathic pain relief and sleep improvement — at a low dose, not primarily for depression.",
+  meta:{age:"Middle-aged adult",condition:"Neuropathic Pain / Insomnia",route:"Oral",drugClass:"Tricyclic Antidepressant",subClass:"Antidepressant",mechanism:"Noradrenaline + serotonin reuptake inhibition",indication:"Neuropathic pain / Depression / Migraine prophylaxis",monitoring:"ECG / anticholinergic effects / BP",sideEffect:"Anticholinergic / sedation / cardiac arrhythmia",controlled:"No"},
+  findings:["Diabetic neuropathy","Neuropathic pain","Sleep disturbance","Low-dose use","Dual indication"],
+  clues:[
+    "TCA with strong analgesic properties at low doses (10–75mg) — below antidepressant threshold",
+    "Mechanism: blocks reuptake of noradrenaline and serotonin; also has Na+ channel blockade",
+    "Anticholinergic effects: dry mouth, urinary retention, constipation, blurred vision",
+    "Avoid in elderly and those with cardiac conduction abnormalities — prolongs QTc interval"
+  ]
+},
+{
+  drug:"Fluconazole",
+  class:"Antifungal",
+  scenario:"A 29-year-old woman on a course of amoxicillin for a chest infection develops vaginal itching, thick white discharge, and vulval soreness. A clinical diagnosis of vaginal candidiasis is made. She has no liver disease and is not pregnant.",
+  meta:{age:"Young adult",condition:"Vaginal Candidiasis",route:"Oral",drugClass:"Azole Antifungal",subClass:"Antifungal",mechanism:"Ergosterol synthesis inhibition (CYP51)",indication:"Candidiasis / Cryptococcal meningitis",monitoring:"LFTs / drug interactions",sideEffect:"GI / hepatotoxicity / QT prolongation",controlled:"No"},
+  findings:["Post-antibiotic","Vaginal candidiasis","Thick white discharge","Not pregnant","Single-dose oral"],
+  clues:[
+    "Class: triazole antifungal — inhibits fungal CYP51 (lanosterol 14-alpha demethylase), reducing ergosterol synthesis",
+    "Single 150mg oral dose is standard for uncomplicated vaginal candidiasis",
+    "Strong CYP2C9 and CYP3A4 inhibitor — significant interaction with warfarin, statins, phenytoin",
+    "Avoid in pregnancy (especially first trimester) — teratogenic at higher doses"
+  ]
+},
+{
+  drug:"Lansoprazole",
+  class:"GI Agent",
+  scenario:"A 52-year-old man with confirmed H. pylori infection and a duodenal ulcer. His physician prescribes triple therapy. He needs a PPI to reduce gastric acid while the antibiotics eradicate H. pylori. He cannot take omeprazole due to a previous adverse reaction.",
+  meta:{age:"Middle-aged adult",condition:"H. pylori / Duodenal Ulcer",route:"Oral",drugClass:"Proton Pump Inhibitor",subClass:"GI Agent",mechanism:"H+/K+ ATPase inhibition",indication:"H. pylori eradication / PUD / GORD",monitoring:"H. pylori test of cure / Mg2+",sideEffect:"Hypomagnesaemia / headache / C.diff",controlled:"No"},
+  findings:["H. pylori positive","Duodenal ulcer","Triple therapy","Omeprazole intolerant","Acid suppression"],
+  clues:[
+    "PPI class — same mechanism as omeprazole (H+/K+ ATPase inhibition) but different CYP profile",
+    "Part of triple therapy: PPI + clarithromycin + amoxicillin for 7–14 days",
+    "Less CYP2C19 interaction than omeprazole — sometimes preferred in patients on clopidogrel",
+    "Test of cure for H. pylori: urea breath test or stool antigen 4+ weeks after completing treatment"
+  ]
+},
+{
+  drug:"Gabapentin",
+  class:"Analgesic",
+  scenario:"A 60-year-old man with post-herpetic neuralgia following a shingles outbreak 4 months ago. He has burning and shooting pain rated 7/10. Previous paracetamol and ibuprofen have been ineffective. He needs a drug licensed for neuropathic pain.",
+  meta:{age:"Older adult",condition:"Post-herpetic Neuralgia",route:"Oral",drugClass:"Gabapentinoid",subClass:"Analgesic",mechanism:"Alpha-2-delta calcium channel subunit binding",indication:"Neuropathic pain / Epilepsy",monitoring:"Renal function / sedation / misuse risk",sideEffect:"Dizziness / sedation / peripheral oedema",controlled:"Yes — Schedule 3 (UK)"},
+  findings:["Post-herpetic neuralgia","Burning/shooting pain 7/10","NSAID-refractory","Neuropathic pain","4 months post-shingles"],
+  clues:[
+    "Mechanism: binds alpha-2-delta subunit of voltage-gated calcium channels — reduces neuronal excitability",
+    "Licensed for neuropathic pain and partial seizures — requires dose titration to minimise side effects",
+    "Dose-adjust in renal impairment — renally cleared, accumulates in CKD",
+    "Reclassified as Schedule 3 controlled drug in UK (2019) due to misuse potential — monitor accordingly"
+  ]
+},
+{
+  drug:"Enoxaparin",
+  class:"Anticoagulant",
+  scenario:"A 58-year-old woman post-total knee replacement is at high risk of DVT. She is being started on pharmacological VTE prophylaxis. The surgical team wants a subcutaneous anticoagulant that does not require routine INR monitoring and can be given once daily.",
+  meta:{age:"Middle-aged adult",condition:"VTE Prophylaxis (post-surgical)",route:"Subcutaneous",drugClass:"Low Molecular Weight Heparin",subClass:"Anticoagulant",mechanism:"Factor Xa and IIa inhibition (via antithrombin)",indication:"VTE prophylaxis / DVT / PE treatment",monitoring:"Renal function / anti-Xa levels (if needed)",sideEffect:"Bleeding / HIT / injection site bruising",controlled:"No"},
+  findings:["Post-knee replacement","VTE prophylaxis","No INR monitoring","Subcutaneous route","Once daily dosing"],
+  clues:[
+    "Class: low molecular weight heparin (LMWH) — inhibits factor Xa more than IIa via antithrombin",
+    "Predictable pharmacokinetics allow fixed dosing — routine monitoring not required in most patients",
+    "Reduce dose or use unfractionated heparin in severe renal impairment (eGFR <30)",
+    "Heparin-induced thrombocytopaenia (HIT) risk — lower than unfractionated heparin but still possible"
+  ]
+},
+{
+  drug:"Paracetamol",
+  class:"Analgesic",
+  scenario:"A 35-year-old woman presents with a tension headache and mild fever of 37.9°C following a viral illness. She has no liver disease, does not drink alcohol excessively, and takes no other medications. She is asking for something safe for pain and fever relief.",
+  meta:{age:"Young adult",condition:"Headache / Mild fever",route:"Oral",drugClass:"Analgesic / Antipyretic",subClass:"Analgesic",mechanism:"COX inhibition (CNS) / endocannabinoid modulation",indication:"Mild-moderate pain / Pyrexia",monitoring:"Hepatotoxicity risk / dosing",sideEffect:"Hepatotoxicity in overdose",controlled:"No"},
+  findings:["Tension headache","Fever 37.9°C","No liver disease","No other medications","Safe analgesia needed"],
+  clues:[
+    "Most widely used analgesic and antipyretic worldwide — considered first-line for mild-moderate pain",
+    "Mechanism not fully understood — acts centrally; lacks significant anti-inflammatory effect unlike NSAIDs",
+    "Safe at therapeutic doses; maximum adult dose 4g/day (1g QDS) — reduce in hepatic impairment or low body weight",
+    "Overdose: causes dose-dependent hepatotoxicity — N-acetylcysteine is the antidote"
+  ]
+},
+{
+  drug:"Lithium",
+  class:"Mood Stabiliser",
+  scenario:"A 26-year-old woman with bipolar I disorder has had two manic episodes in the past 18 months. She is currently euthymic. Her psychiatrist wants to start long-term mood stabilisation. She will need regular blood tests and monitoring of multiple organ systems.",
+  meta:{age:"Young adult",condition:"Bipolar I Disorder",route:"Oral",drugClass:"Mood Stabiliser",subClass:"Mood Stabiliser",mechanism:"Multiple — inositol depletion / GSK-3 inhibition",indication:"Bipolar disorder / Mania prophylaxis",monitoring:"Serum levels / renal / thyroid / ECG",sideEffect:"Tremor / polyuria / hypothyroidism / toxicity",controlled:"No"},
+  findings:["Bipolar I","Two manic episodes","Currently euthymic","Long-term prophylaxis","Intensive monitoring"],
+  clues:[
+    "Narrow therapeutic index — serum levels must be monitored (target 0.6–1.0 mmol/L for prophylaxis)",
+    "Toxicity signs: coarse tremor, confusion, ataxia, vomiting — seek immediate medical attention",
+    "Long-term effects: nephrogenic diabetes insipidus, hypothyroidism — monitor renal and thyroid function",
+    "Teratogenic (Ebstein's anomaly) — effective contraception essential; pre-pregnancy counselling required"
+  ]
+},
+{
+  drug:"Phenytoin",
+  class:"Antiepileptic",
+  scenario:"A 35-year-old man with tonic-clonic epilepsy not controlled on current therapy. His neurologist adds a second antiepileptic known for its complex pharmacokinetics. Monitoring is essential due to saturable metabolism. He requires a loading dose.",
+  meta:{age:"Young adult",condition:"Tonic-clonic Epilepsy",route:"Oral / IV",drugClass:"Sodium Channel Blocker",subClass:"Antiepileptic",mechanism:"Voltage-gated Na+ channel stabilisation",indication:"Tonic-clonic / focal epilepsy / status epilepticus",monitoring:"Serum levels / LFTs / FBC / folate",sideEffect:"Gingival hyperplasia / ataxia / rash / SJS",controlled:"No"},
+  findings:["Tonic-clonic epilepsy","Refractory to monotherapy","Loading dose needed","Complex pharmacokinetics","Second-line addition"],
+  clues:[
+    "Zero-order (saturable) kinetics at therapeutic levels — small dose increases cause disproportionate level rise",
+    "Therapeutic range: 10–20 mg/L — narrow therapeutic index, levels must be monitored",
+    "Numerous drug interactions — enzyme inducer (CYP2C9, CYP3A4): reduces efficacy of many drugs",
+    "Cosmetic side effects: gingival hyperplasia, hirsutism, coarsening of facial features — especially at high doses"
+  ]
+},
+{
+  drug:"Ondansetron",
+  class:"Antiemetic",
+  scenario:"A 45-year-old woman undergoing her second cycle of cisplatin-based chemotherapy for ovarian cancer. She experienced severe nausea and vomiting during cycle 1. Her oncologist adds antiemetic prophylaxis targeting the 5-HT3 pathway for both acute and delayed CINV prevention.",
+  meta:{age:"Middle-aged adult",condition:"Chemotherapy-Induced Nausea/Vomiting",route:"Oral / IV",drugClass:"5-HT3 Antagonist",subClass:"Antiemetic",mechanism:"5-HT3 serotonin receptor antagonism",indication:"CINV / post-op nausea / radiotherapy nausea",monitoring:"QTc interval / electrolytes",sideEffect:"Constipation / headache / QT prolongation",controlled:"No"},
+  findings:["Cisplatin chemotherapy","Cycle 1 severe CINV","5-HT3 pathway","Acute + delayed prevention","Oncology setting"],
+  clues:[
+    "Class: 5-HT3 antagonist — blocks serotonin receptors in the GI tract and chemoreceptor trigger zone",
+    "Most effective for acute CINV (0–24h) — combine with dexamethasone and NK1 antagonist for highly emetogenic regimens",
+    "QTc prolongation risk — avoid with other QT-prolonging drugs; check electrolytes (K+, Mg2+)",
+    "Causes constipation (opposite to most antiemetics) — advise patients to increase fluid and fibre"
+  ]
+},
+{
+  drug:"Bisoprolol",
+  class:"Antihypertensive",
+  scenario:"A 72-year-old man with heart failure with reduced ejection fraction (EF 28%) who is stable on an ACE inhibitor and diuretic. His resting HR is 78 bpm. His cardiologist wants to add a beta-blocker proven to reduce mortality in HFrEF, starting at a very low dose.",
+  meta:{age:"Older adult",condition:"HFrEF",route:"Oral",drugClass:"Beta Blocker",subClass:"Antihypertensive",mechanism:"Beta-1 selective adrenergic blockade",indication:"HFrEF / Hypertension / Angina",monitoring:"HR / BP / fluid status",sideEffect:"Bradycardia / fatigue / cold extremities",controlled:"No"},
+  findings:["HFrEF EF 28%","On ACE inhibitor","On diuretic","HR 78 bpm","Mortality reduction"],
+  clues:[
+    "Highly cardioselective beta-1 blocker — one of three proven to reduce mortality in HFrEF (with carvedilol and metoprolol succinate)",
+    "Start at very low dose (1.25mg) and titrate slowly over weeks — up-titration guided by HR and symptoms",
+    "Paradox in HF: beta-blockers were previously contraindicated but are now cornerstone therapy",
+    "Withhold if acute decompensation, severe bradycardia, or significant hypotension"
+  ]
+}
+];
+
+// ================================================================
+// ALL DRUGS DROPDOWN
+// ================================================================
+const ALL_DRUGS=[
+  // Antidiabetics
+  "Metformin","Insulin Glargine","Insulin Aspart","Insulin Detemir","Gliclazide","Glibenclamide",
+  "Sitagliptin","Saxagliptin","Empagliflozin","Dapagliflozin","Liraglutide","Semaglutide",
+  "Pioglitazone","Acarbose","Repaglinide",
+  // Antihypertensives
+  "Lisinopril","Ramipril","Enalapril","Perindopril","Captopril",
+  "Losartan","Candesartan","Valsartan","Irbesartan","Telmisartan",
+  "Amlodipine","Nifedipine","Diltiazem","Verapamil","Felodipine",
+  "Metoprolol","Bisoprolol","Carvedilol","Atenolol","Propranolol","Nebivolol",
+  "Furosemide","Bumetanide","Indapamide","Bendroflumethiazide","Spironolactone","Eplerenone",
+  "Doxazosin","Prazosin","Hydralazine","Minoxidil","Methyldopa","Clonidine",
+  // Lipid-lowering
+  "Atorvastatin","Simvastatin","Rosuvastatin","Pravastatin","Fluvastatin",
+  "Ezetimibe","Fenofibrate","Gemfibrozil","Colestyramine","Evolocumab","Alirocumab",
+  // Antibiotics
+  "Amoxicillin","Amoxicillin-Clavulanate","Flucloxacillin","Phenoxymethylpenicillin","Piperacillin-Tazobactam",
+  "Cefalexin","Cefuroxime","Ceftriaxone","Cefepime",
+  "Clarithromycin","Azithromycin","Erythromycin",
+  "Doxycycline","Tetracycline","Trimethoprim","Co-trimoxazole",
+  "Ciprofloxacin","Levofloxacin","Moxifloxacin",
+  "Metronidazole","Tinidazole",
+  "Gentamicin","Tobramycin","Amikacin",
+  "Vancomycin","Teicoplanin","Linezolid","Daptomycin",
+  "Meropenem","Ertapenem","Imipenem",
+  "Nitrofurantoin","Fosfomycin",
+  // Antifungals
+  "Fluconazole","Itraconazole","Voriconazole","Posaconazole",
+  "Terbinafine","Griseofulvin","Nystatin","Amphotericin B","Caspofungin",
+  // Antivirals
+  "Aciclovir","Valaciclovir","Oseltamivir","Zanamivir",
+  // Antiepileptics
+  "Phenytoin","Carbamazepine","Valproate","Lamotrigine","Levetiracetam",
+  "Gabapentin","Pregabalin","Topiramate","Clonazepam","Phenobarbitone",
+  // Antidepressants/Psych
+  "Sertraline","Fluoxetine","Citalopram","Escitalopram","Paroxetine","Fluvoxamine",
+  "Venlafaxine","Duloxetine","Mirtazapine","Trazodone",
+  "Amitriptyline","Nortriptyline","Imipramine","Clomipramine",
+  "Lithium","Quetiapine","Olanzapine","Risperidone","Aripiprazole","Haloperidol",
+  "Diazepam","Lorazepam","Clonazepam","Temazepam","Zolpidem","Zopiclone",
+  "Bupropion","Agomelatine",
+  // Analgesics
+  "Paracetamol","Ibuprofen","Naproxen","Diclofenac","Celecoxib","Etoricoxib",
+  "Codeine","Tramadol","Morphine","Oxycodone","Fentanyl","Buprenorphine",
+  "Gabapentin","Pregabalin","Amitriptyline","Duloxetine",
+  "Aspirin","Colchicine",
+  // GI
+  "Omeprazole","Lansoprazole","Esomeprazole","Pantoprazole","Rabeprazole",
+  "Ranitidine","Domperidone","Metoclopramide","Ondansetron","Granisetron",
+  "Loperamide","Senna","Lactulose","Macrogol","Docusate",
+  "Mesalazine","Prednisolone","Azathioprine","Infliximab",
+  "Hyoscine","Mebeverine","Buscopan",
+  // Respiratory
+  "Salbutamol","Terbutaline","Salmeterol","Formoterol","Indacaterol",
+  "Ipratropium","Tiotropium","Umeclidinium",
+  "Beclometasone","Fluticasone","Budesonide","Mometasone",
+  "Montelukast","Zafirlukast","Theophylline","Aminophylline",
+  "Prednisolone","Dexamethasone",
+  // Cardiovascular
+  "Warfarin","Enoxaparin","Dalteparin","Fondaparinux","Heparin",
+  "Apixaban","Rivaroxaban","Dabigatran","Edoxaban",
+  "Clopidogrel","Prasugrel","Ticagrelor","Aspirin","Dipyridamole",
+  "Digoxin","Amiodarone","Flecainide","Sotalol","Adenosine","Ivabradine",
+  "Nicorandil","Isosorbide Mononitrate","Glyceryl Trinitrate",
+  "Ivabradine","Sacubitril-Valsartan",
+  // Endocrine/Other
+  "Levothyroxine","Carbimazole","Propylthiouracil",
+  "Prednisolone","Hydrocortisone","Dexamethasone","Fludrocortisone",
+  "Allopurinol","Febuxostat","Colchicine","Rasburicase",
+  "Alendronic Acid","Risedronate","Zoledronic Acid","Denosumab",
+  "Methotrexate","Hydroxychloroquine","Sulfasalazine","Leflunomide",
+  "Iron Sulphate","Ferrous Fumarate","Folic Acid","Vitamin B12",
+  "Cholecalciferol","Calcium Carbonate",
+  "Fluconazole","Aciclovir","Trimethoprim","Nitrofurantoin",
+  "Phenytoin","Gabapentin","Amitriptyline","Codeine","Ondansetron","Bisoprolol","Ramipril","Lithium"
+].filter((v,i,a)=>a.indexOf(v)===i).sort();
+
+const TILE_LABELS=["Drug Class","Sub-class","Mechanism","Indication","Route","Monitoring","Side Effect Profile","Controlled?"];
+const META_KEYS=["drugClass","subClass","mechanism","indication","route","monitoring","sideEffect","controlled"];
+const MAX_GUESSES=6;
+
+// ================================================================
+// META DB — metadata for every drug so wrong guesses show real info
+// ================================================================
+const META_DB={
+  "Metformin":{drugClass:"Biguanide",subClass:"Antidiabetic",mechanism:"AMPK activation / hepatic glucose reduction",indication:"T2DM first-line",route:"Oral",monitoring:"Renal function / B12 levels",sideEffect:"GI upset / lactic acidosis risk",controlled:"No"},
+  "Insulin Glargine":{drugClass:"Long-acting Insulin",subClass:"Antidiabetic",mechanism:"Insulin receptor agonism (basal)",indication:"T1DM / T2DM basal coverage",route:"Subcutaneous",monitoring:"Blood glucose / HbA1c / injection sites",sideEffect:"Hypoglycaemia / lipohypertrophy / weight gain",controlled:"No"},
+  "Insulin Aspart":{drugClass:"Rapid-acting Insulin",subClass:"Antidiabetic",mechanism:"Insulin receptor agonism (bolus)",indication:"T1DM / T2DM mealtime coverage",route:"Subcutaneous",monitoring:"Blood glucose / HbA1c",sideEffect:"Hypoglycaemia / weight gain",controlled:"No"},
+  "Insulin Detemir":{drugClass:"Long-acting Insulin",subClass:"Antidiabetic",mechanism:"Insulin receptor agonism (basal)",indication:"T1DM / T2DM basal coverage",route:"Subcutaneous",monitoring:"Blood glucose / HbA1c",sideEffect:"Hypoglycaemia / weight gain",controlled:"No"},
+  "Gliclazide":{drugClass:"Sulphonylurea",subClass:"Antidiabetic",mechanism:"Pancreatic beta-cell K+ channel closure",indication:"T2DM",route:"Oral",monitoring:"Blood glucose / renal function",sideEffect:"Hypoglycaemia / weight gain",controlled:"No"},
+  "Glibenclamide":{drugClass:"Sulphonylurea",subClass:"Antidiabetic",mechanism:"Pancreatic beta-cell K+ channel closure",indication:"T2DM",route:"Oral",monitoring:"Blood glucose",sideEffect:"Hypoglycaemia / weight gain",controlled:"No"},
+  "Sitagliptin":{drugClass:"DPP-4 Inhibitor",subClass:"Antidiabetic",mechanism:"DPP-4 enzyme inhibition / incretin enhancement",indication:"T2DM",route:"Oral",monitoring:"Renal function / pancreatitis",sideEffect:"Nasopharyngitis / pancreatitis risk",controlled:"No"},
+  "Empagliflozin":{drugClass:"SGLT-2 Inhibitor",subClass:"Antidiabetic",mechanism:"Renal glucose reabsorption inhibition",indication:"T2DM / HF / CKD",route:"Oral",monitoring:"eGFR / genital infections / DKA",sideEffect:"UTI / genital mycosis / DKA",controlled:"No"},
+  "Dapagliflozin":{drugClass:"SGLT-2 Inhibitor",subClass:"Antidiabetic",mechanism:"Renal glucose reabsorption inhibition",indication:"T2DM / HF / CKD",route:"Oral",monitoring:"eGFR / genital infections",sideEffect:"UTI / genital mycosis / DKA",controlled:"No"},
+  "Liraglutide":{drugClass:"GLP-1 Agonist",subClass:"Antidiabetic",mechanism:"GLP-1 receptor agonism",indication:"T2DM / Obesity",route:"Subcutaneous",monitoring:"Pancreatitis / thyroid",sideEffect:"Nausea / vomiting / pancreatitis",controlled:"No"},
+  "Semaglutide":{drugClass:"GLP-1 Agonist",subClass:"Antidiabetic",mechanism:"GLP-1 receptor agonism",indication:"T2DM / Obesity",route:"Subcutaneous / Oral",monitoring:"Pancreatitis / thyroid / GI",sideEffect:"Nausea / vomiting / pancreatitis",controlled:"No"},
+  "Pioglitazone":{drugClass:"Thiazolidinedione",subClass:"Antidiabetic",mechanism:"PPAR-gamma agonism",indication:"T2DM",route:"Oral",monitoring:"LFTs / fluid retention / bladder cancer",sideEffect:"Weight gain / fluid retention / fractures",controlled:"No"},
+  "Lisinopril":{drugClass:"ACE Inhibitor",subClass:"Antihypertensive",mechanism:"Angiotensin converting enzyme inhibition",indication:"HTN + renoprotection",route:"Oral",monitoring:"K+ / Cr / BP",sideEffect:"Dry cough / angioedema",controlled:"No"},
+  "Ramipril":{drugClass:"ACE Inhibitor",subClass:"Antihypertensive",mechanism:"Angiotensin converting enzyme inhibition",indication:"HFrEF / HTN / Post-MI",route:"Oral",monitoring:"K+ / Cr / BP",sideEffect:"Dry cough / angioedema / hypotension",controlled:"No"},
+  "Enalapril":{drugClass:"ACE Inhibitor",subClass:"Antihypertensive",mechanism:"Angiotensin converting enzyme inhibition",indication:"HTN / HF",route:"Oral",monitoring:"K+ / Cr / BP",sideEffect:"Dry cough / angioedema",controlled:"No"},
+  "Perindopril":{drugClass:"ACE Inhibitor",subClass:"Antihypertensive",mechanism:"Angiotensin converting enzyme inhibition",indication:"HTN / Post-MI / HF",route:"Oral",monitoring:"K+ / Cr / BP",sideEffect:"Dry cough / angioedema",controlled:"No"},
+  "Losartan":{drugClass:"ARB",subClass:"Antihypertensive",mechanism:"AT1 receptor blockade",indication:"HTN / HFrEF / Diabetic nephropathy",route:"Oral",monitoring:"K+ / Cr / BP",sideEffect:"Hyperkalaemia / hypotension",controlled:"No"},
+  "Candesartan":{drugClass:"ARB",subClass:"Antihypertensive",mechanism:"AT1 receptor blockade",indication:"HTN / HFrEF",route:"Oral",monitoring:"K+ / Cr / BP",sideEffect:"Hyperkalaemia / hypotension",controlled:"No"},
+  "Amlodipine":{drugClass:"Calcium Channel Blocker",subClass:"Antihypertensive",mechanism:"L-type calcium channel blockade (vascular)",indication:"HTN / Angina / Raynaud's",route:"Oral",monitoring:"BP / ankle oedema / HR",sideEffect:"Peripheral oedema / flushing / headache",controlled:"No"},
+  "Nifedipine":{drugClass:"Calcium Channel Blocker",subClass:"Antihypertensive",mechanism:"L-type calcium channel blockade (vascular)",indication:"HTN / Angina / Raynaud's",route:"Oral",monitoring:"BP / HR / oedema",sideEffect:"Flushing / headache / reflex tachycardia",controlled:"No"},
+  "Diltiazem":{drugClass:"Calcium Channel Blocker",subClass:"Antihypertensive",mechanism:"L-type calcium channel blockade (cardiac + vascular)",indication:"HTN / Angina / AF rate control",route:"Oral",monitoring:"HR / BP / ECG",sideEffect:"Bradycardia / AV block / constipation",controlled:"No"},
+  "Verapamil":{drugClass:"Calcium Channel Blocker",subClass:"Antihypertensive",mechanism:"L-type calcium channel blockade (mainly cardiac)",indication:"HTN / Angina / SVT",route:"Oral / IV",monitoring:"HR / BP / ECG / constipation",sideEffect:"Bradycardia / AV block / constipation",controlled:"No"},
+  "Metoprolol":{drugClass:"Beta Blocker",subClass:"Antihypertensive",mechanism:"Beta-1 selective adrenergic blockade",indication:"Angina / HTN / Post-MI / HF",route:"Oral",monitoring:"HR / BP / blood glucose masking",sideEffect:"Bradycardia / fatigue / cold extremities",controlled:"No"},
+  "Bisoprolol":{drugClass:"Beta Blocker",subClass:"Antihypertensive",mechanism:"Beta-1 selective adrenergic blockade",indication:"HFrEF / Hypertension / Angina",route:"Oral",monitoring:"HR / BP / fluid status",sideEffect:"Bradycardia / fatigue / cold extremities",controlled:"No"},
+  "Carvedilol":{drugClass:"Beta Blocker",subClass:"Antihypertensive",mechanism:"Non-selective beta + alpha-1 blockade",indication:"HFrEF / HTN",route:"Oral",monitoring:"HR / BP / blood glucose",sideEffect:"Bradycardia / dizziness / fatigue",controlled:"No"},
+  "Atenolol":{drugClass:"Beta Blocker",subClass:"Antihypertensive",mechanism:"Beta-1 selective adrenergic blockade",indication:"HTN / Angina",route:"Oral",monitoring:"HR / BP / renal function",sideEffect:"Bradycardia / fatigue / cold extremities",controlled:"No"},
+  "Propranolol":{drugClass:"Beta Blocker",subClass:"Antihypertensive",mechanism:"Non-selective beta adrenergic blockade",indication:"HTN / Anxiety / Migraine / Thyrotoxicosis",route:"Oral",monitoring:"HR / BP / bronchoconstriction",sideEffect:"Bradycardia / bronchospasm / fatigue",controlled:"No"},
+  "Furosemide":{drugClass:"Loop Diuretic",subClass:"Diuretic",mechanism:"Na-K-2Cl cotransporter inhibition (Loop of Henle)",indication:"Heart failure / oedema / hypertension",route:"IV / Oral",monitoring:"Electrolytes / renal function / BP",sideEffect:"Hypokalaemia / hyponatraemia / ototoxicity",controlled:"No"},
+  "Spironolactone":{drugClass:"Potassium-sparing Diuretic",subClass:"Diuretic",mechanism:"Aldosterone receptor antagonism",indication:"HF / hyperaldosteronism / oedema",route:"Oral",monitoring:"K+ / renal function / gynaecomastia",sideEffect:"Hyperkalaemia / gynaecomastia / menstrual irregularity",controlled:"No"},
+  "Atorvastatin":{drugClass:"Statin",subClass:"Lipid-lowering",mechanism:"HMG-CoA reductase inhibition",indication:"High-intensity lipid lowering",route:"Oral",monitoring:"LFTs / CK / lipid panel",sideEffect:"Myopathy / rhabdomyolysis",controlled:"No"},
+  "Simvastatin":{drugClass:"Statin",subClass:"Lipid-lowering",mechanism:"HMG-CoA reductase inhibition",indication:"Dyslipidaemia / CVD prevention",route:"Oral",monitoring:"LFTs / CK / interactions",sideEffect:"Myopathy / GI",controlled:"No"},
+  "Rosuvastatin":{drugClass:"Statin",subClass:"Lipid-lowering",mechanism:"HMG-CoA reductase inhibition",indication:"High-intensity lipid lowering",route:"Oral",monitoring:"LFTs / CK / renal function",sideEffect:"Myopathy / proteinuria",controlled:"No"},
+  "Amoxicillin":{drugClass:"Penicillin",subClass:"Antibiotic",mechanism:"Beta-lactam / cell wall synthesis inhibition",indication:"Group A Strep infection",route:"Oral",monitoring:"Allergy history",sideEffect:"Rash / diarrhoea",controlled:"No"},
+  "Flucloxacillin":{drugClass:"Penicillin",subClass:"Antibiotic",mechanism:"Beta-lactam / cell wall synthesis inhibition",indication:"Staphylococcal infections / cellulitis",route:"Oral / IV",monitoring:"LFTs / allergy",sideEffect:"GI / hepatotoxicity (rare)",controlled:"No"},
+  "Cefalexin":{drugClass:"Cephalosporin",subClass:"Antibiotic",mechanism:"Beta-lactam / cell wall synthesis inhibition",indication:"Skin / UTI / respiratory infections",route:"Oral",monitoring:"Allergy / renal function",sideEffect:"GI / rash",controlled:"No"},
+  "Ceftriaxone":{drugClass:"Cephalosporin",subClass:"Antibiotic",mechanism:"Beta-lactam / cell wall synthesis inhibition",indication:"Serious systemic infections / meningitis",route:"IV / IM",monitoring:"Allergy / renal / hepatic",sideEffect:"GI / biliary sludge",controlled:"No"},
+  "Clarithromycin":{drugClass:"Macrolide",subClass:"Antibiotic",mechanism:"50S ribosomal subunit inhibition",indication:"RTI / H. pylori eradication / atypicals",route:"Oral / IV",monitoring:"QTc / LFTs / interactions",sideEffect:"GI / QT prolongation / taste disturbance",controlled:"No"},
+  "Azithromycin":{drugClass:"Macrolide",subClass:"Antibiotic",mechanism:"50S ribosomal subunit inhibition",indication:"RTI / STIs / atypical pneumonia",route:"Oral / IV",monitoring:"QTc / LFTs",sideEffect:"GI / QT prolongation",controlled:"No"},
+  "Doxycycline":{drugClass:"Tetracycline",subClass:"Antibiotic",mechanism:"30S ribosomal subunit inhibition",indication:"Atypical infections / malaria prophylaxis / acne",route:"Oral",monitoring:"Photosensitivity / dental staining",sideEffect:"GI / photosensitivity / oesophagitis",controlled:"No"},
+  "Trimethoprim":{drugClass:"Folate Antagonist",subClass:"Antibiotic",mechanism:"Dihydrofolate reductase inhibition",indication:"Uncomplicated UTI",route:"Oral",monitoring:"Renal function / FBC long-term",sideEffect:"Rash / hyperkalaemia / folate interaction",controlled:"No"},
+  "Ciprofloxacin":{drugClass:"Fluoroquinolone",subClass:"Antibiotic",mechanism:"DNA gyrase / topoisomerase IV inhibition",indication:"UTI / GI infections / Pseudomonas",route:"Oral / IV",monitoring:"QTc / tendon rupture / interactions",sideEffect:"Tendinopathy / QT prolongation / CNS",controlled:"No"},
+  "Metronidazole":{drugClass:"Nitroimidazole",subClass:"Antibiotic",mechanism:"DNA strand breakage (anaerobes / protozoa)",indication:"Anaerobic infections / C.diff / H.pylori / giardia",route:"Oral / IV",monitoring:"Alcohol avoidance / neurotoxicity",sideEffect:"GI / metallic taste / disulfiram reaction",controlled:"No"},
+  "Vancomycin":{drugClass:"Glycopeptide",subClass:"Antibiotic",mechanism:"Cell wall synthesis inhibition (D-Ala-D-Ala binding)",indication:"MRSA / C.diff (oral) / serious gram-positive",route:"IV / Oral",monitoring:"Trough levels / renal function / ototoxicity",sideEffect:"Nephrotoxicity / Red man syndrome / ototoxicity",controlled:"No"},
+  "Nitrofurantoin":{drugClass:"Nitrofuran",subClass:"Antibiotic",mechanism:"Multiple mechanisms / DNA damage",indication:"Lower UTI prophylaxis and treatment",route:"Oral",monitoring:"eGFR / pulmonary toxicity",sideEffect:"GI / pulmonary fibrosis (long-term) / peripheral neuropathy",controlled:"No"},
+  "Fluconazole":{drugClass:"Azole Antifungal",subClass:"Antifungal",mechanism:"Ergosterol synthesis inhibition (CYP51)",indication:"Candidiasis / Cryptococcal meningitis",route:"Oral / IV",monitoring:"LFTs / drug interactions",sideEffect:"GI / hepatotoxicity / QT prolongation",controlled:"No"},
+  "Itraconazole":{drugClass:"Azole Antifungal",subClass:"Antifungal",mechanism:"Ergosterol synthesis inhibition",indication:"Dermatophyte / Aspergillus / endemic fungi",route:"Oral",monitoring:"LFTs / drug interactions / cardiac",sideEffect:"GI / hepatotoxicity / negative inotropy",controlled:"No"},
+  "Voriconazole":{drugClass:"Azole Antifungal",subClass:"Antifungal",mechanism:"Ergosterol synthesis inhibition",indication:"Invasive Aspergillosis / serious fungal infections",route:"Oral / IV",monitoring:"LFTs / visual disturbances / levels",sideEffect:"Visual disturbances / photosensitivity / hepatotoxicity",controlled:"No"},
+  "Terbinafine":{drugClass:"Allylamine Antifungal",subClass:"Antifungal",mechanism:"Squalene epoxidase inhibition",indication:"Dermatophyte infections / onychomycosis",route:"Oral / Topical",monitoring:"LFTs / taste disturbance",sideEffect:"GI / hepatotoxicity / taste loss",controlled:"No"},
+  "Aciclovir":{drugClass:"Antiviral",subClass:"Antiviral",mechanism:"Viral thymidine kinase / DNA polymerase inhibition",indication:"HSV / VZV infections",route:"Oral / IV / Topical",monitoring:"Renal function / hydration",sideEffect:"Nephrotoxicity (IV) / neurotoxicity / GI",controlled:"No"},
+  "Sertraline":{drugClass:"SSRI",subClass:"Antidepressant",mechanism:"Serotonin reuptake inhibition",indication:"Depression / Anxiety",route:"Oral",monitoring:"Mood / suicidality / serotonin syndrome",sideEffect:"Sexual dysfunction / GI / insomnia",controlled:"No"},
+  "Fluoxetine":{drugClass:"SSRI",subClass:"Antidepressant",mechanism:"Serotonin reuptake inhibition",indication:"Depression / OCD / Bulimia / PMDD",route:"Oral",monitoring:"Mood / suicidality / interactions",sideEffect:"Insomnia / GI / sexual dysfunction",controlled:"No"},
+  "Citalopram":{drugClass:"SSRI",subClass:"Antidepressant",mechanism:"Serotonin reuptake inhibition",indication:"Depression",route:"Oral",monitoring:"QTc / mood / dose limits",sideEffect:"QT prolongation / GI / sexual dysfunction",controlled:"No"},
+  "Venlafaxine":{drugClass:"SNRI",subClass:"Antidepressant",mechanism:"Serotonin + noradrenaline reuptake inhibition",indication:"Depression / Anxiety / Neuropathic pain",route:"Oral",monitoring:"BP / mood / discontinuation",sideEffect:"Hypertension / sweating / sexual dysfunction",controlled:"No"},
+  "Duloxetine":{drugClass:"SNRI",subClass:"Antidepressant",mechanism:"Serotonin + noradrenaline reuptake inhibition",indication:"Depression / Neuropathic pain / Stress incontinence",route:"Oral",monitoring:"BP / LFTs / mood",sideEffect:"GI / sweating / hepatotoxicity",controlled:"No"},
+  "Mirtazapine":{drugClass:"NaSSA",subClass:"Antidepressant",mechanism:"Alpha-2 / H1 / 5-HT2/3 receptor antagonism",indication:"Depression / Anxiety / Insomnia",route:"Oral",monitoring:"Weight / sedation / mood",sideEffect:"Sedation / weight gain / dry mouth",controlled:"No"},
+  "Amitriptyline":{drugClass:"Tricyclic Antidepressant",subClass:"Antidepressant",mechanism:"Noradrenaline + serotonin reuptake inhibition",indication:"Neuropathic pain / Depression / Migraine prophylaxis",route:"Oral",monitoring:"ECG / anticholinergic effects / BP",sideEffect:"Anticholinergic / sedation / cardiac arrhythmia",controlled:"No"},
+  "Lithium":{drugClass:"Mood Stabiliser",subClass:"Mood Stabiliser",mechanism:"Multiple — inositol depletion / GSK-3 inhibition",indication:"Bipolar disorder / Mania prophylaxis",route:"Oral",monitoring:"Serum levels / renal / thyroid / ECG",sideEffect:"Tremor / polyuria / hypothyroidism / toxicity",controlled:"No"},
+  "Quetiapine":{drugClass:"Atypical Antipsychotic",subClass:"Antipsychotic",mechanism:"D2 / 5-HT2A receptor antagonism",indication:"Schizophrenia / Bipolar / Depression augmentation",route:"Oral",monitoring:"Metabolic / QTc / sedation",sideEffect:"Sedation / weight gain / QT prolongation",controlled:"No"},
+  "Olanzapine":{drugClass:"Atypical Antipsychotic",subClass:"Antipsychotic",mechanism:"D2 / 5-HT2A receptor antagonism",indication:"Schizophrenia / Bipolar mania / CINV",route:"Oral / IM",monitoring:"Metabolic / glucose / weight",sideEffect:"Weight gain / metabolic syndrome / sedation",controlled:"No"},
+  "Diazepam":{drugClass:"Benzodiazepine",subClass:"Anxiolytic",mechanism:"GABA-A receptor positive allosteric modulation",indication:"Seizures / Anxiety / Alcohol withdrawal",route:"IV / PR / Buccal",monitoring:"Respiratory rate / sedation / BP",sideEffect:"Respiratory depression / sedation / dependence",controlled:"Yes — Schedule 4 CD"},
+  "Lorazepam":{drugClass:"Benzodiazepine",subClass:"Anxiolytic",mechanism:"GABA-A receptor positive allosteric modulation",indication:"Seizures / Anxiety / Pre-medication",route:"IV / IM / Oral",monitoring:"Respiratory rate / sedation",sideEffect:"Respiratory depression / sedation / dependence",controlled:"Yes — Schedule 4 CD"},
+  "Phenytoin":{drugClass:"Sodium Channel Blocker",subClass:"Antiepileptic",mechanism:"Voltage-gated Na+ channel stabilisation",indication:"Tonic-clonic / focal epilepsy / status epilepticus",route:"Oral / IV",monitoring:"Serum levels / LFTs / FBC / folate",sideEffect:"Gingival hyperplasia / ataxia / rash / SJS",controlled:"No"},
+  "Carbamazepine":{drugClass:"Sodium Channel Blocker",subClass:"Antiepileptic",mechanism:"Voltage-gated Na+ channel stabilisation",indication:"Focal epilepsy / Trigeminal neuralgia / Bipolar",route:"Oral",monitoring:"Levels / FBC / electrolytes / LFTs",sideEffect:"Rash / SJS / hyponatraemia / diplopia",controlled:"No"},
+  "Valproate":{drugClass:"Multiple Mechanisms",subClass:"Antiepileptic",mechanism:"Na+ channel / GABA enhancement / multiple",indication:"Generalised epilepsy / Bipolar / Migraine",route:"Oral / IV",monitoring:"LFTs / FBC / levels / teratogenicity",sideEffect:"Teratogenic / hepatotoxicity / weight / tremor",controlled:"No"},
+  "Lamotrigine":{drugClass:"Sodium Channel Blocker",subClass:"Antiepileptic",mechanism:"Voltage-gated Na+ channel stabilisation",indication:"Focal / generalised epilepsy / Bipolar",route:"Oral",monitoring:"Rash / titration rate",sideEffect:"Rash / SJS (if titrated too fast) / diplopia",controlled:"No"},
+  "Levetiracetam":{drugClass:"SV2A Ligand",subClass:"Antiepileptic",mechanism:"Synaptic vesicle protein 2A binding",indication:"Focal / generalised epilepsy",route:"Oral / IV",monitoring:"Mood / behaviour",sideEffect:"Behavioural changes / irritability / somnolence",controlled:"No"},
+  "Gabapentin":{drugClass:"Gabapentinoid",subClass:"Analgesic",mechanism:"Alpha-2-delta calcium channel subunit binding",indication:"Neuropathic pain / Epilepsy",route:"Oral",monitoring:"Renal function / sedation / misuse risk",sideEffect:"Dizziness / sedation / peripheral oedema",controlled:"Yes — Schedule 3 (UK)"},
+  "Pregabalin":{drugClass:"Gabapentinoid",subClass:"Analgesic",mechanism:"Alpha-2-delta calcium channel subunit binding",indication:"Neuropathic pain / Epilepsy / GAD",route:"Oral",monitoring:"Renal function / sedation / misuse",sideEffect:"Dizziness / sedation / weight gain",controlled:"Yes — Schedule 3 (UK)"},
+  "Paracetamol":{drugClass:"Analgesic / Antipyretic",subClass:"Analgesic",mechanism:"COX inhibition (CNS) / endocannabinoid modulation",indication:"Mild-moderate pain / Pyrexia",route:"Oral / IV / PR",monitoring:"Hepatotoxicity risk / dosing",sideEffect:"Hepatotoxicity in overdose",controlled:"No"},
+  "Codeine":{drugClass:"Opioid",subClass:"Analgesic",mechanism:"Mu-opioid receptor agonism (prodrug)",indication:"Mild-moderate pain / Cough suppression",route:"Oral",monitoring:"Respiratory rate / CYP2D6 status",sideEffect:"Constipation / drowsiness / dependence",controlled:"Yes — Schedule 5/CD"},
+  "Tramadol":{drugClass:"Opioid",subClass:"Analgesic",mechanism:"Mu-opioid agonism + SNRI",indication:"Moderate-severe pain",route:"Oral / IV",monitoring:"Seizure threshold / serotonin syndrome",sideEffect:"Nausea / seizures / serotonin syndrome",controlled:"Yes — Schedule 3 CD"},
+  "Morphine":{drugClass:"Opioid",subClass:"Analgesic",mechanism:"Mu-opioid receptor agonism",indication:"Severe pain / Palliative care / Acute MI",route:"Oral / IV / SC",monitoring:"Respiratory rate / sedation / constipation",sideEffect:"Respiratory depression / constipation / nausea",controlled:"Yes — Schedule 2 CD"},
+  "Omeprazole":{drugClass:"Proton Pump Inhibitor",subClass:"GI Agent",mechanism:"H+/K+ ATPase inhibition",indication:"PUD / GORD / gastroprotection",route:"Oral / IV",monitoring:"Mg2+ / B12 long-term",sideEffect:"Hypomagnesaemia / C.diff risk / B12 deficiency",controlled:"No"},
+  "Lansoprazole":{drugClass:"Proton Pump Inhibitor",subClass:"GI Agent",mechanism:"H+/K+ ATPase inhibition",indication:"H. pylori eradication / PUD / GORD",route:"Oral",monitoring:"H. pylori test of cure / Mg2+",sideEffect:"Hypomagnesaemia / headache / C.diff",controlled:"No"},
+  "Ondansetron":{drugClass:"5-HT3 Antagonist",subClass:"Antiemetic",mechanism:"5-HT3 serotonin receptor antagonism",indication:"CINV / post-op nausea / radiotherapy nausea",route:"Oral / IV",monitoring:"QTc interval / electrolytes",sideEffect:"Constipation / headache / QT prolongation",controlled:"No"},
+  "Domperidone":{drugClass:"Dopamine Antagonist",subClass:"Antiemetic",mechanism:"D2 receptor blockade (peripheral)",indication:"Nausea / Gastroparesis / Migraine",route:"Oral",monitoring:"QTc / cardiac risk",sideEffect:"QT prolongation / galactorrhoea",controlled:"No"},
+  "Salbutamol":{drugClass:"SABA",subClass:"Bronchodilator",mechanism:"Beta-2 adrenergic agonism",indication:"Acute bronchospasm / Asthma rescue",route:"Inhaled",monitoring:"Heart rate / K+ with high doses",sideEffect:"Tremor / tachycardia / hypokalaemia",controlled:"No"},
+  "Salmeterol":{drugClass:"LABA",subClass:"Bronchodilator",mechanism:"Beta-2 adrenergic agonism (long-acting)",indication:"Asthma maintenance / COPD",route:"Inhaled",monitoring:"HR / not for acute use",sideEffect:"Tremor / tachycardia",controlled:"No"},
+  "Tiotropium":{drugClass:"LAMA",subClass:"Bronchodilator",mechanism:"M3 muscarinic receptor antagonism",indication:"COPD maintenance",route:"Inhaled",monitoring:"Urinary retention / glaucoma",sideEffect:"Dry mouth / urinary retention / constipation",controlled:"No"},
+  "Beclometasone":{drugClass:"Inhaled Corticosteroid",subClass:"Anti-inflammatory",mechanism:"Glucocorticoid receptor agonism (local)",indication:"Asthma preventer / COPD",route:"Inhaled",monitoring:"Growth (children) / oral candida",sideEffect:"Oral candidiasis / dysphonia / adrenal suppression",controlled:"No"},
+  "Montelukast":{drugClass:"Leukotriene Antagonist",subClass:"Bronchodilator",mechanism:"CysLT1 receptor blockade",indication:"Asthma / Allergic rhinitis",route:"Oral",monitoring:"Mood / neuropsychiatric effects",sideEffect:"Neuropsychiatric effects / headache",controlled:"No"},
+  "Prednisolone":{drugClass:"Corticosteroid",subClass:"Anti-inflammatory",mechanism:"Glucocorticoid receptor agonism",indication:"Asthma / RA / inflammatory conditions",route:"Oral",monitoring:"Blood glucose / BP / bone density",sideEffect:"Hyperglycaemia / immunosuppression / osteoporosis",controlled:"No"},
+  "Warfarin":{drugClass:"Vitamin K Antagonist",subClass:"Anticoagulant",mechanism:"Vitamin K epoxide reductase inhibition",indication:"AF / VTE / Mechanical valve",route:"Oral",monitoring:"INR / diet / interactions",sideEffect:"Bleeding / bruising / teratogenic",controlled:"No"},
+  "Enoxaparin":{drugClass:"Low Molecular Weight Heparin",subClass:"Anticoagulant",mechanism:"Factor Xa and IIa inhibition (via antithrombin)",indication:"VTE prophylaxis / DVT / PE treatment",route:"Subcutaneous",monitoring:"Renal function / anti-Xa levels (if needed)",sideEffect:"Bleeding / HIT / injection site bruising",controlled:"No"},
+  "Apixaban":{drugClass:"Direct Oral Anticoagulant",subClass:"Anticoagulant",mechanism:"Direct Factor Xa inhibition",indication:"AF / VTE treatment / prophylaxis",route:"Oral",monitoring:"Renal function / bleeding",sideEffect:"Bleeding / bruising",controlled:"No"},
+  "Rivaroxaban":{drugClass:"Direct Oral Anticoagulant",subClass:"Anticoagulant",mechanism:"Direct Factor Xa inhibition",indication:"AF / VTE treatment / prophylaxis",route:"Oral",monitoring:"Renal function / bleeding",sideEffect:"Bleeding / GI",controlled:"No"},
+  "Dabigatran":{drugClass:"Direct Oral Anticoagulant",subClass:"Anticoagulant",mechanism:"Direct thrombin (Factor IIa) inhibition",indication:"AF / VTE",route:"Oral",monitoring:"Renal function / bleeding",sideEffect:"GI / bleeding / dyspepsia",controlled:"No"},
+  "Clopidogrel":{drugClass:"P2Y12 Inhibitor",subClass:"Antiplatelet",mechanism:"ADP receptor (P2Y12) irreversible blockade",indication:"ACS / Post-PCI / Stroke prevention",route:"Oral",monitoring:"Bleeding / CYP2C19 status",sideEffect:"Bleeding / bruising / TTP (rare)",controlled:"No"},
+  "Aspirin":{drugClass:"NSAID / Antiplatelet",subClass:"Antiplatelet",mechanism:"COX-1 irreversible inhibition / TXA2 reduction",indication:"Antiplatelet / Analgesia / Antipyretic",route:"Oral",monitoring:"GI bleeding / renal",sideEffect:"GI irritation / bleeding / Reye's syndrome",controlled:"No"},
+  "Amiodarone":{drugClass:"Class III Antiarrhythmic",subClass:"Antiarrhythmic",mechanism:"K+ channel blockade + multiple",indication:"AF / VT / VF",route:"Oral / IV",monitoring:"TFTs / LFTs / pulmonary / eye / skin",sideEffect:"Thyroid / pulmonary toxicity / corneal deposits / photosensitivity",controlled:"No"},
+  "Digoxin":{drugClass:"Cardiac Glycoside",subClass:"Antiarrhythmic",mechanism:"Na/K ATPase inhibition / vagotonic",indication:"AF rate control / HF",route:"Oral / IV",monitoring:"Serum levels / K+ / renal / ECG",sideEffect:"Toxicity: nausea / visual / bradycardia / arrhythmias",controlled:"No"},
+  "Levothyroxine":{drugClass:"Thyroid Hormone",subClass:"Thyroid Agent",mechanism:"Exogenous T4 replacement",indication:"Hypothyroidism",route:"Oral",monitoring:"TSH / free T4 / cardiac symptoms",sideEffect:"Cardiac / osteoporosis if over-replaced",controlled:"No"},
+  "Carbimazole":{drugClass:"Thionamide",subClass:"Thyroid Agent",mechanism:"Thyroid peroxidase inhibition",indication:"Hyperthyroidism / Graves' disease",route:"Oral",monitoring:"FBC (agranulocytosis) / TFTs",sideEffect:"Agranulocytosis / rash / hypothyroidism",controlled:"No"},
+  "Allopurinol":{drugClass:"Xanthine Oxidase Inhibitor",subClass:"Gout Agent",mechanism:"Xanthine oxidase inhibition",indication:"Gout prophylaxis / Hyperuricaemia",route:"Oral",monitoring:"Uric acid / renal function / FBC",sideEffect:"Rash / SJS / gout flare on initiation",controlled:"No"},
+  "Colchicine":{drugClass:"Anti-inflammatory",subClass:"Gout Agent",mechanism:"Microtubule polymerisation inhibition",indication:"Acute gout / Pericarditis",route:"Oral",monitoring:"GI / renal / hepatic",sideEffect:"GI toxicity / diarrhoea / myelosuppression",controlled:"No"},
+  "Alendronic Acid":{drugClass:"Bisphosphonate",subClass:"Bone Agent",mechanism:"Osteoclast inhibition",indication:"Osteoporosis / Paget's disease",route:"Oral",monitoring:"Dental / oesophageal / Ca2+ / Vit D",sideEffect:"Oesophagitis / ONJ / atypical fractures",controlled:"No"},
+  "Methotrexate":{drugClass:"DMARD / Antimetabolite",subClass:"Immunosuppressant",mechanism:"Dihydrofolate reductase inhibition",indication:"RA / psoriasis / malignancy",route:"Oral / SC / IV",monitoring:"FBC / LFTs / renal / chest",sideEffect:"Myelosuppression / hepatotoxicity / pulmonary",controlled:"No"},
+  "Iron Sulphate":{drugClass:"Iron Supplement",subClass:"Haematinic",mechanism:"Iron replacement / haemoglobin synthesis",indication:"Iron deficiency anaemia",route:"Oral",monitoring:"FBC / ferritin / GI tolerance",sideEffect:"GI: constipation / nausea / black stools",controlled:"No"},
+  "Folic Acid":{drugClass:"Vitamin B supplement",subClass:"Haematinic",mechanism:"Folate replacement / DNA synthesis",indication:"Megaloblastic anaemia / pregnancy",route:"Oral",monitoring:"B12 level (may mask deficiency)",sideEffect:"Rare at therapeutic doses",controlled:"No"},
+  "Ondansetron":{drugClass:"5-HT3 Antagonist",subClass:"Antiemetic",mechanism:"5-HT3 serotonin receptor antagonism",indication:"CINV / post-op nausea / radiotherapy nausea",route:"Oral / IV",monitoring:"QTc interval / electrolytes",sideEffect:"Constipation / headache / QT prolongation",controlled:"No"},
+  "Bisoprolol":{drugClass:"Beta Blocker",subClass:"Antihypertensive",mechanism:"Beta-1 selective adrenergic blockade",indication:"HFrEF / Hypertension / Angina",route:"Oral",monitoring:"HR / BP / fluid status",sideEffect:"Bradycardia / fatigue / cold extremities",controlled:"No"},
+  "Saxagliptin":{drugClass:"DPP-4 Inhibitor",subClass:"Antidiabetic",mechanism:"DPP-4 enzyme inhibition / incretin enhancement",indication:"T2DM",route:"Oral",monitoring:"Renal function / pancreatitis / HF",sideEffect:"Nasopharyngitis / pancreatitis / HF risk",controlled:"No"},
+  "Acarbose":{drugClass:"Alpha-glucosidase Inhibitor",subClass:"Antidiabetic",mechanism:"Intestinal alpha-glucosidase inhibition",indication:"T2DM",route:"Oral",monitoring:"LFTs / GI tolerance",sideEffect:"Flatulence / diarrhoea / abdominal pain",controlled:"No"},
+  "Repaglinide":{drugClass:"Meglitinide",subClass:"Antidiabetic",mechanism:"Pancreatic beta-cell K+ channel closure (short-acting)",indication:"T2DM with irregular meals",route:"Oral",monitoring:"Blood glucose / renal",sideEffect:"Hypoglycaemia / GI",controlled:"No"},
+  "Captopril":{drugClass:"ACE Inhibitor",subClass:"Antihypertensive",mechanism:"Angiotensin converting enzyme inhibition",indication:"HTN / HF / Post-MI",route:"Oral",monitoring:"K+ / Cr / BP",sideEffect:"Dry cough / angioedema / rash",controlled:"No"},
+  "Valsartan":{drugClass:"ARB",subClass:"Antihypertensive",mechanism:"AT1 receptor blockade",indication:"HTN / HF / Post-MI",route:"Oral",monitoring:"K+ / Cr / BP",sideEffect:"Hyperkalaemia / hypotension",controlled:"No"},
+  "Irbesartan":{drugClass:"ARB",subClass:"Antihypertensive",mechanism:"AT1 receptor blockade",indication:"HTN / Diabetic nephropathy",route:"Oral",monitoring:"K+ / Cr / BP",sideEffect:"Hyperkalaemia / hypotension",controlled:"No"},
+  "Telmisartan":{drugClass:"ARB",subClass:"Antihypertensive",mechanism:"AT1 receptor blockade",indication:"HTN / CVD risk reduction",route:"Oral",monitoring:"K+ / Cr / BP",sideEffect:"Hyperkalaemia / hypotension",controlled:"No"},
+  "Felodipine":{drugClass:"Calcium Channel Blocker",subClass:"Antihypertensive",mechanism:"L-type calcium channel blockade (vascular)",indication:"HTN / Angina / Raynaud's",route:"Oral",monitoring:"BP / oedema / HR",sideEffect:"Peripheral oedema / flushing / headache",controlled:"No"},
+  "Nebivolol":{drugClass:"Beta Blocker",subClass:"Antihypertensive",mechanism:"Beta-1 selective blockade + NO-mediated vasodilation",indication:"HTN / HFrEF",route:"Oral",monitoring:"HR / BP",sideEffect:"Bradycardia / fatigue / headache",controlled:"No"},
+  "Bumetanide":{drugClass:"Loop Diuretic",subClass:"Diuretic",mechanism:"Na-K-2Cl cotransporter inhibition",indication:"Oedema / HF",route:"Oral / IV",monitoring:"Electrolytes / renal / BP",sideEffect:"Hypokalaemia / hyponatraemia / ototoxicity",controlled:"No"},
+  "Indapamide":{drugClass:"Thiazide-like Diuretic",subClass:"Diuretic",mechanism:"Na-Cl cotransporter inhibition / vasodilation",indication:"HTN / oedema",route:"Oral",monitoring:"Electrolytes / renal / glucose",sideEffect:"Hypokalaemia / hyponatraemia / hyperuricaemia",controlled:"No"},
+  "Bendroflumethiazide":{drugClass:"Thiazide Diuretic",subClass:"Diuretic",mechanism:"Na-Cl cotransporter inhibition",indication:"HTN / oedema",route:"Oral",monitoring:"Electrolytes / glucose / uric acid",sideEffect:"Hypokalaemia / hyperglycaemia / gout",controlled:"No"},
+  "Eplerenone":{drugClass:"Potassium-sparing Diuretic",subClass:"Diuretic",mechanism:"Selective aldosterone receptor antagonism",indication:"HF post-MI / HTN",route:"Oral",monitoring:"K+ / renal function",sideEffect:"Hyperkalaemia / gynaecomastia (less than spironolactone)",controlled:"No"},
+  "Doxazosin":{drugClass:"Alpha Blocker",subClass:"Antihypertensive",mechanism:"Alpha-1 adrenergic receptor blockade",indication:"HTN / BPH",route:"Oral",monitoring:"BP (postural hypotension) / syncope",sideEffect:"Postural hypotension / dizziness / oedema",controlled:"No"},
+  "Prazosin":{drugClass:"Alpha Blocker",subClass:"Antihypertensive",mechanism:"Alpha-1 adrenergic receptor blockade",indication:"HTN / BPH / PTSD nightmares",route:"Oral",monitoring:"BP (first-dose hypotension)",sideEffect:"First-dose hypotension / dizziness / headache",controlled:"No"},
+  "Hydralazine":{drugClass:"Vasodilator",subClass:"Antihypertensive",mechanism:"Direct arteriolar smooth muscle relaxation",indication:"Severe HTN / HF (with nitrate)",route:"Oral / IV",monitoring:"BP / HR / lupus symptoms",sideEffect:"Reflex tachycardia / drug-induced lupus / fluid retention",controlled:"No"},
+  "Minoxidil":{drugClass:"Vasodilator",subClass:"Antihypertensive",mechanism:"K+ channel opening / arteriolar dilation",indication:"Severe resistant HTN / Alopecia (topical)",route:"Oral / Topical",monitoring:"BP / HR / fluid / pericardial effusion",sideEffect:"Hypertrichosis / fluid retention / reflex tachycardia",controlled:"No"},
+  "Methyldopa":{drugClass:"Central Alpha-2 Agonist",subClass:"Antihypertensive",mechanism:"Central alpha-2 receptor agonism / reduces sympathetic output",indication:"HTN in pregnancy",route:"Oral",monitoring:"BP / LFTs / Coombs test",sideEffect:"Sedation / depression / hepatotoxicity",controlled:"No"},
+  "Clonidine":{drugClass:"Central Alpha-2 Agonist",subClass:"Antihypertensive",mechanism:"Central alpha-2 receptor agonism",indication:"HTN / ADHD / opioid withdrawal",route:"Oral",monitoring:"BP / rebound HTN on withdrawal",sideEffect:"Sedation / dry mouth / rebound HTN",controlled:"No"},
+  "Pravastatin":{drugClass:"Statin",subClass:"Lipid-lowering",mechanism:"HMG-CoA reductase inhibition",indication:"Dyslipidaemia / CVD prevention",route:"Oral",monitoring:"LFTs / CK / lipid panel",sideEffect:"Myopathy / GI (fewer interactions than others)",controlled:"No"},
+  "Fluvastatin":{drugClass:"Statin",subClass:"Lipid-lowering",mechanism:"HMG-CoA reductase inhibition",indication:"Dyslipidaemia",route:"Oral",monitoring:"LFTs / CK",sideEffect:"Myopathy / GI",controlled:"No"},
+  "Ezetimibe":{drugClass:"Cholesterol Absorption Inhibitor",subClass:"Lipid-lowering",mechanism:"NPC1L1 transporter inhibition / reduces intestinal cholesterol absorption",indication:"Dyslipidaemia (adjunct or statin-intolerant)",route:"Oral",monitoring:"LFTs / lipid panel",sideEffect:"GI / myopathy (with statin) / headache",controlled:"No"},
+  "Fenofibrate":{drugClass:"Fibrate",subClass:"Lipid-lowering",mechanism:"PPAR-alpha agonism / increases lipoprotein lipase",indication:"Hypertriglyceridaemia / mixed dyslipidaemia",route:"Oral",monitoring:"LFTs / CK / renal",sideEffect:"GI / myopathy / gallstones",controlled:"No"},
+  "Gemfibrozil":{drugClass:"Fibrate",subClass:"Lipid-lowering",mechanism:"PPAR-alpha agonism",indication:"Hypertriglyceridaemia",route:"Oral",monitoring:"LFTs / CK / statins interaction",sideEffect:"GI / myopathy / gallstones",controlled:"No"},
+  "Colestyramine":{drugClass:"Bile Acid Sequestrant",subClass:"Lipid-lowering",mechanism:"Bile acid binding in gut / increases LDL receptor expression",indication:"Dyslipidaemia / bile acid diarrhoea",route:"Oral",monitoring:"Fat-soluble vitamin absorption / drug interactions",sideEffect:"Constipation / bloating / drug malabsorption",controlled:"No"},
+  "Evolocumab":{drugClass:"PCSK9 Inhibitor",subClass:"Lipid-lowering",mechanism:"PCSK9 monoclonal antibody / increases LDL receptor recycling",indication:"Familial hypercholesterolaemia / high CVD risk",route:"Subcutaneous",monitoring:"Lipid panel / injection site",sideEffect:"Injection site reaction / myalgia",controlled:"No"},
+  "Alirocumab":{drugClass:"PCSK9 Inhibitor",subClass:"Lipid-lowering",mechanism:"PCSK9 monoclonal antibody",indication:"Familial hypercholesterolaemia / high CVD risk",route:"Subcutaneous",monitoring:"Lipid panel / injection site",sideEffect:"Injection site reaction / nasopharyngitis",controlled:"No"},
+  "Amoxicillin-Clavulanate":{drugClass:"Penicillin",subClass:"Antibiotic",mechanism:"Beta-lactam + beta-lactamase inhibitor",indication:"Mixed infections / resistant organisms",route:"Oral / IV",monitoring:"LFTs / allergy / GI",sideEffect:"GI / cholestatic jaundice / rash",controlled:"No"},
+  "Phenoxymethylpenicillin":{drugClass:"Penicillin",subClass:"Antibiotic",mechanism:"Beta-lactam / cell wall synthesis inhibition",indication:"Streptococcal infections / prophylaxis",route:"Oral",monitoring:"Allergy history",sideEffect:"GI / rash / hypersensitivity",controlled:"No"},
+  "Piperacillin-Tazobactam":{drugClass:"Penicillin",subClass:"Antibiotic",mechanism:"Beta-lactam + beta-lactamase inhibitor (broad spectrum)",indication:"Severe hospital-acquired infections / Pseudomonas",route:"IV",monitoring:"Renal function / electrolytes / allergy",sideEffect:"GI / electrolyte disturbance / C.diff",controlled:"No"},
+  "Cefuroxime":{drugClass:"Cephalosporin",subClass:"Antibiotic",mechanism:"Beta-lactam / cell wall synthesis inhibition",indication:"RTI / surgical prophylaxis / Lyme disease",route:"Oral / IV",monitoring:"Allergy / renal",sideEffect:"GI / rash",controlled:"No"},
+  "Cefepime":{drugClass:"Cephalosporin",subClass:"Antibiotic",mechanism:"Beta-lactam / cell wall synthesis inhibition",indication:"Serious gram-negative infections / Pseudomonas",route:"IV",monitoring:"Renal / neurotoxicity",sideEffect:"Neurotoxicity in renal impairment / GI",controlled:"No"},
+  "Erythromycin":{drugClass:"Macrolide",subClass:"Antibiotic",mechanism:"50S ribosomal subunit inhibition",indication:"Penicillin allergy / atypical infections / acne",route:"Oral / IV",monitoring:"QTc / LFTs / interactions",sideEffect:"GI / QT prolongation / hepatotoxicity",controlled:"No"},
+  "Tetracycline":{drugClass:"Tetracycline",subClass:"Antibiotic",mechanism:"30S ribosomal subunit inhibition",indication:"Acne / H.pylori / atypical infections",route:"Oral",monitoring:"Photosensitivity / dental staining / antacids",sideEffect:"GI / photosensitivity / dental staining",controlled:"No"},
+  "Co-trimoxazole":{drugClass:"Folate Antagonist",subClass:"Antibiotic",mechanism:"Dihydrofolate reductase + DHPS inhibition (dual blockade)",indication:"PCP prophylaxis / UTI / toxoplasmosis",route:"Oral / IV",monitoring:"FBC / renal / sulfonamide allergy",sideEffect:"Rash / SJS / hyperkalaemia / bone marrow suppression",controlled:"No"},
+  "Levofloxacin":{drugClass:"Fluoroquinolone",subClass:"Antibiotic",mechanism:"DNA gyrase / topoisomerase IV inhibition",indication:"CAP / UTI / sinusitis",route:"Oral / IV",monitoring:"QTc / tendon / glucose",sideEffect:"Tendinopathy / QT prolongation / CNS",controlled:"No"},
+  "Moxifloxacin":{drugClass:"Fluoroquinolone",subClass:"Antibiotic",mechanism:"DNA gyrase / topoisomerase IV inhibition",indication:"CAP / sinusitis / skin infections",route:"Oral / IV",monitoring:"QTc / LFTs",sideEffect:"QT prolongation / hepatotoxicity / CNS",controlled:"No"},
+  "Tinidazole":{drugClass:"Nitroimidazole",subClass:"Antibiotic",mechanism:"DNA strand breakage (anaerobes / protozoa)",indication:"Giardia / trichomoniasis / anaerobic infections",route:"Oral",monitoring:"Alcohol avoidance",sideEffect:"GI / metallic taste / disulfiram reaction",controlled:"No"},
+  "Gentamicin":{drugClass:"Aminoglycoside",subClass:"Antibiotic",mechanism:"30S ribosomal subunit inhibition",indication:"Severe gram-negative infections / endocarditis",route:"IV / IM",monitoring:"Levels / renal / ototoxicity",sideEffect:"Nephrotoxicity / ototoxicity / neuromuscular blockade",controlled:"No"},
+  "Tobramycin":{drugClass:"Aminoglycoside",subClass:"Antibiotic",mechanism:"30S ribosomal subunit inhibition",indication:"Gram-negative / Pseudomonas / CF",route:"IV / Inhaled",monitoring:"Levels / renal / hearing",sideEffect:"Nephrotoxicity / ototoxicity",controlled:"No"},
+  "Amikacin":{drugClass:"Aminoglycoside",subClass:"Antibiotic",mechanism:"30S ribosomal subunit inhibition",indication:"MDR gram-negative infections / TB",route:"IV / IM",monitoring:"Levels / renal / hearing",sideEffect:"Nephrotoxicity / ototoxicity",controlled:"No"},
+  "Teicoplanin":{drugClass:"Glycopeptide",subClass:"Antibiotic",mechanism:"Cell wall synthesis inhibition (D-Ala-D-Ala binding)",indication:"MRSA / serious gram-positive infections",route:"IV / IM",monitoring:"Levels / renal / LFTs",sideEffect:"Nephrotoxicity / rash (less red man than vancomycin)",controlled:"No"},
+  "Linezolid":{drugClass:"Oxazolidinone",subClass:"Antibiotic",mechanism:"23S rRNA binding / protein synthesis inhibition",indication:"MRSA / VRE / resistant gram-positive",route:"Oral / IV",monitoring:"FBC (thrombocytopaenia) / serotonin syndrome",sideEffect:"Thrombocytopaenia / serotonin syndrome / lactic acidosis",controlled:"No"},
+  "Daptomycin":{drugClass:"Lipopeptide",subClass:"Antibiotic",mechanism:"Cell membrane depolarisation",indication:"MRSA / bacteraemia / endocarditis",route:"IV",monitoring:"CK / renal / pulmonary (not for pneumonia)",sideEffect:"Myopathy / elevated CK / GI",controlled:"No"},
+  "Meropenem":{drugClass:"Carbapenem",subClass:"Antibiotic",mechanism:"Beta-lactam / cell wall synthesis inhibition (broad spectrum)",indication:"Severe hospital infections / MDR organisms",route:"IV",monitoring:"Allergy / renal / seizure threshold",sideEffect:"GI / seizures (less than imipenem) / C.diff",controlled:"No"},
+  "Ertapenem":{drugClass:"Carbapenem",subClass:"Antibiotic",mechanism:"Beta-lactam / cell wall synthesis inhibition",indication:"Community-acquired infections / ESBL organisms",route:"IV / IM",monitoring:"Allergy / renal",sideEffect:"GI / headache / infusion reactions",controlled:"No"},
+  "Imipenem":{drugClass:"Carbapenem",subClass:"Antibiotic",mechanism:"Beta-lactam / cell wall synthesis inhibition",indication:"Severe mixed infections",route:"IV",monitoring:"Renal / seizure threshold (highest risk)",sideEffect:"Seizures / GI / C.diff",controlled:"No"},
+  "Fosfomycin":{drugClass:"Phosphonic Acid Antibiotic",subClass:"Antibiotic",mechanism:"MurA enzyme inhibition / peptidoglycan synthesis",indication:"Uncomplicated UTI / ESBL UTI",route:"Oral (sachet)",monitoring:"Sodium content / renal",sideEffect:"GI / diarrhoea / headache",controlled:"No"},
+  "Posaconazole":{drugClass:"Azole Antifungal",subClass:"Antifungal",mechanism:"Ergosterol synthesis inhibition",indication:"Invasive fungal prophylaxis / Aspergillus / Mucor",route:"Oral / IV",monitoring:"LFTs / QTc / drug levels / interactions",sideEffect:"GI / hepatotoxicity / QT prolongation",controlled:"No"},
+  "Griseofulvin":{drugClass:"Antifungal",subClass:"Antifungal",mechanism:"Microtubule disruption / keratin binding",indication:"Dermatophyte infections (skin / hair / nail)",route:"Oral",monitoring:"LFTs / FBC / interactions",sideEffect:"Photosensitivity / GI / hepatotoxicity",controlled:"No"},
+  "Nystatin":{drugClass:"Polyene Antifungal",subClass:"Antifungal",mechanism:"Ergosterol binding / membrane disruption",indication:"Oral / GI candidiasis (not systemic)",route:"Oral / Topical",monitoring:"Oral tolerance",sideEffect:"GI (oral) / local irritation (topical)",controlled:"No"},
+  "Amphotericin B":{drugClass:"Polyene Antifungal",subClass:"Antifungal",mechanism:"Ergosterol binding / membrane pore formation",indication:"Severe systemic fungal infections",route:"IV",monitoring:"Renal / electrolytes / FBC / temperature",sideEffect:"Nephrotoxicity / infusion reactions / hypokalaemia",controlled:"No"},
+  "Caspofungin":{drugClass:"Echinocandin",subClass:"Antifungal",mechanism:"Beta-1,3-glucan synthase inhibition / cell wall disruption",indication:"Invasive candidiasis / Aspergillus",route:"IV",monitoring:"LFTs / drug interactions",sideEffect:"Fever / GI / hepatotoxicity",controlled:"No"},
+  "Valaciclovir":{drugClass:"Antiviral",subClass:"Antiviral",mechanism:"Prodrug of aciclovir / viral DNA polymerase inhibition",indication:"HSV / VZV / cold sores",route:"Oral",monitoring:"Renal function",sideEffect:"GI / headache / nephrotoxicity (high dose)",controlled:"No"},
+  "Oseltamivir":{drugClass:"Neuraminidase Inhibitor",subClass:"Antiviral",mechanism:"Influenza neuraminidase inhibition",indication:"Influenza treatment / prophylaxis",route:"Oral",monitoring:"Renal function / neuropsychiatric",sideEffect:"GI / nausea / neuropsychiatric (rare)",controlled:"No"},
+  "Zanamivir":{drugClass:"Neuraminidase Inhibitor",subClass:"Antiviral",mechanism:"Influenza neuraminidase inhibition",indication:"Influenza (inhaled)",route:"Inhaled",monitoring:"Bronchospasm risk in asthma/COPD",sideEffect:"Bronchospasm / GI / headache",controlled:"No"},
+  "Topiramate":{drugClass:"Multiple Mechanisms",subClass:"Antiepileptic",mechanism:"Na+ channel / GABA / glutamate / carbonic anhydrase",indication:"Epilepsy / Migraine prophylaxis / Obesity",route:"Oral",monitoring:"Kidney stones / cognitive / weight",sideEffect:"Cognitive impairment / kidney stones / weight loss",controlled:"No"},
+  "Clonazepam":{drugClass:"Benzodiazepine",subClass:"Antiepileptic",mechanism:"GABA-A receptor positive allosteric modulation",indication:"Epilepsy / panic disorder / myoclonus",route:"Oral",monitoring:"Sedation / dependence / respiratory",sideEffect:"Sedation / dependence / ataxia",controlled:"Yes — Schedule 4 CD"},
+  "Phenobarbitone":{drugClass:"Barbiturate",subClass:"Antiepileptic",mechanism:"GABA-A receptor potentiation / Na+ channel inhibition",indication:"Epilepsy / status epilepticus",route:"Oral / IV",monitoring:"Levels / sedation / enzyme induction",sideEffect:"Sedation / dependence / cognitive impairment",controlled:"Yes — Schedule 3 CD"},
+  "Escitalopram":{drugClass:"SSRI",subClass:"Antidepressant",mechanism:"Serotonin reuptake inhibition",indication:"Depression / GAD / panic disorder",route:"Oral",monitoring:"QTc / mood / dose limits",sideEffect:"QT prolongation / GI / sexual dysfunction",controlled:"No"},
+  "Paroxetine":{drugClass:"SSRI",subClass:"Antidepressant",mechanism:"Serotonin reuptake inhibition",indication:"Depression / OCD / PTSD / panic",route:"Oral",monitoring:"Discontinuation syndrome / weight / interactions",sideEffect:"Discontinuation syndrome / weight gain / sexual dysfunction",controlled:"No"},
+  "Fluvoxamine":{drugClass:"SSRI",subClass:"Antidepressant",mechanism:"Serotonin reuptake inhibition",indication:"OCD / depression",route:"Oral",monitoring:"CYP interactions / QTc",sideEffect:"GI / sedation / significant drug interactions",controlled:"No"},
+  "Trazodone":{drugClass:"SARI",subClass:"Antidepressant",mechanism:"5-HT2 antagonism + serotonin reuptake inhibition",indication:"Depression / insomnia / anxiety",route:"Oral",monitoring:"Sedation / priapism / orthostatic hypotension",sideEffect:"Sedation / priapism / orthostatic hypotension",controlled:"No"},
+  "Nortriptyline":{drugClass:"Tricyclic Antidepressant",subClass:"Antidepressant",mechanism:"Noradrenaline reuptake inhibition (primary)",indication:"Depression / neuropathic pain",route:"Oral",monitoring:"ECG / anticholinergic / levels",sideEffect:"Anticholinergic / sedation (less than amitriptyline)",controlled:"No"},
+  "Imipramine":{drugClass:"Tricyclic Antidepressant",subClass:"Antidepressant",mechanism:"Noradrenaline + serotonin reuptake inhibition",indication:"Depression / enuresis / panic",route:"Oral",monitoring:"ECG / anticholinergic / BP",sideEffect:"Anticholinergic / cardiac / sedation",controlled:"No"},
+  "Clomipramine":{drugClass:"Tricyclic Antidepressant",subClass:"Antidepressant",mechanism:"Serotonin reuptake inhibition (primary TCA)",indication:"OCD / depression / phobias",route:"Oral",monitoring:"ECG / anticholinergic / serotonin syndrome",sideEffect:"Anticholinergic / sedation / seizures",controlled:"No"},
+  "Risperidone":{drugClass:"Atypical Antipsychotic",subClass:"Antipsychotic",mechanism:"D2 / 5-HT2A receptor antagonism",indication:"Schizophrenia / bipolar / agitation",route:"Oral / IM (depot)",monitoring:"EPS / prolactin / metabolic / QTc",sideEffect:"EPS / hyperprolactinaemia / weight gain",controlled:"No"},
+  "Aripiprazole":{drugClass:"Atypical Antipsychotic",subClass:"Antipsychotic",mechanism:"D2 partial agonism / 5-HT2A antagonism",indication:"Schizophrenia / bipolar / depression augmentation",route:"Oral / IM",monitoring:"Metabolic / akathisia",sideEffect:"Akathisia / insomnia / GI (fewer metabolic effects)",controlled:"No"},
+  "Haloperidol":{drugClass:"Typical Antipsychotic",subClass:"Antipsychotic",mechanism:"D2 receptor blockade",indication:"Schizophrenia / acute agitation / delirium / CINV",route:"Oral / IV / IM",monitoring:"EPS / QTc / NMS",sideEffect:"EPS / tardive dyskinesia / QT prolongation / NMS",controlled:"No"},
+  "Temazepam":{drugClass:"Benzodiazepine",subClass:"Anxiolytic",mechanism:"GABA-A receptor positive allosteric modulation",indication:"Short-term insomnia",route:"Oral",monitoring:"Dependence / morning sedation",sideEffect:"Dependence / next-day sedation / respiratory depression",controlled:"Yes — Schedule 3 CD"},
+  "Zolpidem":{drugClass:"Z-drug",subClass:"Anxiolytic",mechanism:"GABA-A receptor positive allosteric modulation (BZ1 selective)",indication:"Short-term insomnia",route:"Oral",monitoring:"Dependence / sleep behaviours / next-day impairment",sideEffect:"Sleepwalking / dependence / amnesia",controlled:"Yes — Schedule 4 CD"},
+  "Zopiclone":{drugClass:"Z-drug",subClass:"Anxiolytic",mechanism:"GABA-A receptor positive allosteric modulation",indication:"Short-term insomnia",route:"Oral",monitoring:"Dependence / metallic taste / rebound",sideEffect:"Metallic taste / dependence / next-day sedation",controlled:"Yes — Schedule 3 CD"},
+  "Bupropion":{drugClass:"NDRI",subClass:"Antidepressant",mechanism:"Noradrenaline + dopamine reuptake inhibition",indication:"Depression / smoking cessation",route:"Oral",monitoring:"Seizure threshold / BP / psychiatric",sideEffect:"Seizures / insomnia / dry mouth / hypertension",controlled:"No"},
+  "Agomelatine":{drugClass:"Melatonin Agonist",subClass:"Antidepressant",mechanism:"MT1/MT2 agonism + 5-HT2C antagonism",indication:"Depression",route:"Oral",monitoring:"LFTs (baseline and during treatment)",sideEffect:"Hepatotoxicity / GI / dizziness",controlled:"No"},
+  "Ibuprofen":{drugClass:"NSAID",subClass:"Analgesic",mechanism:"COX-1 and COX-2 inhibition",indication:"Pain / inflammation / fever",route:"Oral / Topical",monitoring:"Renal / GI / CV risk / BP",sideEffect:"GI irritation / renal impairment / fluid retention",controlled:"No"},
+  "Naproxen":{drugClass:"NSAID",subClass:"Analgesic",mechanism:"COX-1 and COX-2 inhibition",indication:"Pain / inflammation / dysmenorrhoea",route:"Oral",monitoring:"Renal / GI / CV / BP",sideEffect:"GI irritation / renal impairment / CV risk",controlled:"No"},
+  "Diclofenac":{drugClass:"NSAID",subClass:"Analgesic",mechanism:"COX-1 and COX-2 inhibition (COX-2 preferential)",indication:"Pain / inflammation / osteoarthritis",route:"Oral / Topical / IM",monitoring:"Renal / GI / CV / LFTs",sideEffect:"GI / hepatotoxicity / CV risk",controlled:"No"},
+  "Celecoxib":{drugClass:"COX-2 Inhibitor",subClass:"Analgesic",mechanism:"Selective COX-2 inhibition",indication:"Osteoarthritis / RA / pain",route:"Oral",monitoring:"CV risk / renal / sulfonamide allergy",sideEffect:"CV risk / GI (less than non-selective NSAIDs) / oedema",controlled:"No"},
+  "Etoricoxib":{drugClass:"COX-2 Inhibitor",subClass:"Analgesic",mechanism:"Selective COX-2 inhibition",indication:"Osteoarthritis / RA / gout / pain",route:"Oral",monitoring:"CV risk / renal / BP",sideEffect:"CV risk / oedema / GI (less than NSAIDs)",controlled:"No"},
+  "Oxycodone":{drugClass:"Opioid",subClass:"Analgesic",mechanism:"Mu-opioid receptor agonism",indication:"Moderate-severe pain / cancer pain",route:"Oral / IV",monitoring:"Respiratory rate / sedation / constipation",sideEffect:"Respiratory depression / constipation / dependence",controlled:"Yes — Schedule 2 CD"},
+  "Fentanyl":{drugClass:"Opioid",subClass:"Analgesic",mechanism:"Mu-opioid receptor agonism (highly lipophilic)",indication:"Severe pain / anaesthesia / palliative",route:"IV / Transdermal / Buccal",monitoring:"Respiratory rate / patch rotation / overdose risk",sideEffect:"Respiratory depression / constipation / skin reactions",controlled:"Yes — Schedule 2 CD"},
+  "Buprenorphine":{drugClass:"Opioid",subClass:"Analgesic",mechanism:"Partial mu-opioid agonist / kappa antagonist",indication:"Pain / opioid dependence treatment",route:"Sublingual / Transdermal / IV",monitoring:"Respiratory / hepatic / diversion risk",sideEffect:"Nausea / headache / withdrawal in dependent patients",controlled:"Yes — Schedule 3 CD"},
+  "Esomeprazole":{drugClass:"Proton Pump Inhibitor",subClass:"GI Agent",mechanism:"H+/K+ ATPase inhibition",indication:"GORD / PUD / H.pylori eradication",route:"Oral / IV",monitoring:"Mg2+ / B12 long-term",sideEffect:"Hypomagnesaemia / C.diff / B12 deficiency",controlled:"No"},
+  "Pantoprazole":{drugClass:"Proton Pump Inhibitor",subClass:"GI Agent",mechanism:"H+/K+ ATPase inhibition",indication:"GORD / PUD / stress ulcer prophylaxis",route:"Oral / IV",monitoring:"Mg2+ / interactions (fewer CYP interactions)",sideEffect:"Hypomagnesaemia / headache / GI",controlled:"No"},
+  "Rabeprazole":{drugClass:"Proton Pump Inhibitor",subClass:"GI Agent",mechanism:"H+/K+ ATPase inhibition",indication:"GORD / PUD / H.pylori",route:"Oral",monitoring:"Mg2+ / B12",sideEffect:"GI / headache / hypomagnesaemia",controlled:"No"},
+  "Ranitidine":{drugClass:"H2 Receptor Antagonist",subClass:"GI Agent",mechanism:"Histamine H2 receptor blockade / reduces gastric acid",indication:"PUD / GORD (historical — withdrawn in many markets)",route:"Oral / IV",monitoring:"NDMA contamination concerns",sideEffect:"Headache / GI / confusion (elderly)",controlled:"No"},
+  "Metoclopramide":{drugClass:"Dopamine Antagonist",subClass:"Antiemetic",mechanism:"D2 receptor blockade (central + peripheral) / prokinetic",indication:"Nausea / gastroparesis / migraine",route:"Oral / IV / IM",monitoring:"EPS / tardive dyskinesia / QTc",sideEffect:"EPS / tardive dyskinesia / hyperprolactinaemia",controlled:"No"},
+  "Granisetron":{drugClass:"5-HT3 Antagonist",subClass:"Antiemetic",mechanism:"5-HT3 serotonin receptor antagonism",indication:"CINV / post-op nausea",route:"Oral / IV / Transdermal",monitoring:"QTc / electrolytes",sideEffect:"Constipation / headache / QT prolongation",controlled:"No"},
+  "Loperamide":{drugClass:"Opioid Receptor Agonist",subClass:"GI Agent",mechanism:"Peripheral mu-opioid agonism / reduces GI motility",indication:"Acute diarrhoea / IBS-D",route:"Oral",monitoring:"Ileus risk / cardiac (high dose)",sideEffect:"Constipation / abdominal cramps / paralytic ileus",controlled:"No"},
+  "Senna":{drugClass:"Stimulant Laxative",subClass:"GI Agent",mechanism:"Anthraquinone / colonic motility stimulation",indication:"Constipation (short-term)",route:"Oral",monitoring:"Electrolytes / dependency / melanosis coli",sideEffect:"Abdominal cramps / electrolyte disturbance / dependency",controlled:"No"},
+  "Lactulose":{drugClass:"Osmotic Laxative",subClass:"GI Agent",mechanism:"Non-absorbable disaccharide / osmotic water retention",indication:"Constipation / hepatic encephalopathy",route:"Oral",monitoring:"Electrolytes / fluid balance",sideEffect:"Flatulence / bloating / diarrhoea",controlled:"No"},
+  "Macrogol":{drugClass:"Osmotic Laxative",subClass:"GI Agent",mechanism:"Polyethylene glycol / osmotic water retention",indication:"Constipation / bowel preparation",route:"Oral",monitoring:"Fluid balance / electrolytes",sideEffect:"Bloating / nausea / electrolyte disturbance",controlled:"No"},
+  "Docusate":{drugClass:"Stool Softener",subClass:"GI Agent",mechanism:"Surfactant / increases water penetration into stool",indication:"Constipation / faecal impaction",route:"Oral / PR",monitoring:"GI tolerance",sideEffect:"GI cramping / diarrhoea",controlled:"No"},
+  "Mesalazine":{drugClass:"Aminosalicylate",subClass:"GI Agent",mechanism:"Local anti-inflammatory / COX inhibition in colonic mucosa",indication:"Ulcerative colitis / Crohn's (colonic)",route:"Oral / PR",monitoring:"Renal / FBC / LFTs",sideEffect:"GI / nephrotoxicity / blood dyscrasias",controlled:"No"},
+  "Azathioprine":{drugClass:"DMARD / Immunosuppressant",subClass:"Immunosuppressant",mechanism:"Purine analogue / inhibits lymphocyte proliferation",indication:"IBD / RA / transplant rejection / autoimmune",route:"Oral",monitoring:"FBC / LFTs / TPMT genotype",sideEffect:"Myelosuppression / hepatotoxicity / GI",controlled:"No"},
+  "Infliximab":{drugClass:"TNF-alpha Inhibitor",subClass:"Biologic",mechanism:"Anti-TNF-alpha monoclonal antibody",indication:"RA / IBD / psoriasis / ankylosing spondylitis",route:"IV",monitoring:"TB screening / infection / FBC / LFTs",sideEffect:"Infections / infusion reactions / reactivation TB",controlled:"No"},
+  "Hyoscine":{drugClass:"Anticholinergic",subClass:"GI Agent",mechanism:"Muscarinic receptor antagonism",indication:"Motion sickness / nausea / GI spasm / palliative",route:"Oral / Transdermal / SC / IV",monitoring:"Anticholinergic effects / urinary retention",sideEffect:"Dry mouth / blurred vision / urinary retention / sedation",controlled:"No"},
+  "Mebeverine":{drugClass:"Antispasmodic",subClass:"GI Agent",mechanism:"Direct smooth muscle relaxation (non-anticholinergic)",indication:"IBS / GI spasm",route:"Oral",monitoring:"GI tolerance",sideEffect:"Rare — GI / rash",controlled:"No"},
+  "Buscopan":{drugClass:"Anticholinergic",subClass:"GI Agent",mechanism:"Muscarinic receptor antagonism (peripheral)",indication:"GI / ureteral spasm / dysmenorrhoea",route:"Oral / IV / IM",monitoring:"Anticholinergic effects",sideEffect:"Dry mouth / tachycardia / urinary retention",controlled:"No"},
+  "Terbutaline":{drugClass:"SABA",subClass:"Bronchodilator",mechanism:"Beta-2 adrenergic agonism",indication:"Asthma rescue / premature labour",route:"Inhaled / SC / IV",monitoring:"HR / K+ / glucose",sideEffect:"Tremor / tachycardia / hypokalaemia",controlled:"No"},
+  "Formoterol":{drugClass:"LABA",subClass:"Bronchodilator",mechanism:"Beta-2 adrenergic agonism (long-acting, rapid onset)",indication:"Asthma maintenance / COPD",route:"Inhaled",monitoring:"HR / not monotherapy in asthma",sideEffect:"Tremor / tachycardia / hypokalaemia",controlled:"No"},
+  "Indacaterol":{drugClass:"LABA",subClass:"Bronchodilator",mechanism:"Beta-2 adrenergic agonism (ultra-long-acting)",indication:"COPD maintenance (not asthma)",route:"Inhaled",monitoring:"HR / not for acute use",sideEffect:"Cough on inhalation / tremor",controlled:"No"},
+  "Ipratropium":{drugClass:"SAMA",subClass:"Bronchodilator",mechanism:"M3 muscarinic receptor antagonism (short-acting)",indication:"COPD / acute asthma (adjunct)",route:"Inhaled",monitoring:"Urinary retention / glaucoma",sideEffect:"Dry mouth / urinary retention / paradoxical bronchospasm",controlled:"No"},
+  "Umeclidinium":{drugClass:"LAMA",subClass:"Bronchodilator",mechanism:"M3 muscarinic receptor antagonism (long-acting)",indication:"COPD maintenance",route:"Inhaled",monitoring:"Urinary retention / glaucoma",sideEffect:"Dry mouth / urinary retention / nasopharyngitis",controlled:"No"},
+  "Fluticasone":{drugClass:"Inhaled Corticosteroid",subClass:"Anti-inflammatory",mechanism:"Glucocorticoid receptor agonism (local)",indication:"Asthma preventer / COPD / allergic rhinitis",route:"Inhaled / Intranasal",monitoring:"Oral candida / growth (children) / adrenal",sideEffect:"Oral candidiasis / dysphonia / skin thinning",controlled:"No"},
+  "Budesonide":{drugClass:"Inhaled Corticosteroid",subClass:"Anti-inflammatory",mechanism:"Glucocorticoid receptor agonism (local)",indication:"Asthma / COPD / Crohn's / allergic rhinitis",route:"Inhaled / Oral / PR",monitoring:"Oral candida / adrenal / growth",sideEffect:"Oral candidiasis / dysphonia / adrenal suppression",controlled:"No"},
+  "Mometasone":{drugClass:"Inhaled Corticosteroid",subClass:"Anti-inflammatory",mechanism:"Glucocorticoid receptor agonism (local)",indication:"Asthma / allergic rhinitis",route:"Inhaled / Intranasal",monitoring:"Oral candida / growth",sideEffect:"Oral candidiasis / dysphonia",controlled:"No"},
+  "Zafirlukast":{drugClass:"Leukotriene Antagonist",subClass:"Bronchodilator",mechanism:"CysLT1 receptor blockade",indication:"Asthma prophylaxis",route:"Oral",monitoring:"LFTs / Churg-Strauss",sideEffect:"Hepatotoxicity / headache / GI",controlled:"No"},
+  "Theophylline":{drugClass:"Methylxanthine",subClass:"Bronchodilator",mechanism:"Phosphodiesterase inhibition / adenosine antagonism",indication:"COPD / asthma (adjunct)",route:"Oral / IV",monitoring:"Narrow TI — serum levels / HR / GI / interactions",sideEffect:"Arrhythmias / seizures / GI / narrow therapeutic index",controlled:"No"},
+  "Aminophylline":{drugClass:"Methylxanthine",subClass:"Bronchodilator",mechanism:"Phosphodiesterase inhibition (theophylline prodrug IV)",indication:"Severe acute asthma / COPD (IV)",route:"IV",monitoring:"Serum levels / HR / BP",sideEffect:"Arrhythmias / hypotension / nausea",controlled:"No"},
+  "Dexamethasone":{drugClass:"Corticosteroid",subClass:"Anti-inflammatory",mechanism:"Glucocorticoid receptor agonism (potent)",indication:"Cerebral oedema / CINV / croup / COVID / allergic",route:"Oral / IV / IM",monitoring:"Glucose / BP / adrenal / infection",sideEffect:"Hyperglycaemia / immunosuppression / adrenal suppression",controlled:"No"},
+  "Dalteparin":{drugClass:"Low Molecular Weight Heparin",subClass:"Anticoagulant",mechanism:"Factor Xa and IIa inhibition (via antithrombin)",indication:"VTE prophylaxis / treatment / cancer-associated thrombosis",route:"Subcutaneous",monitoring:"Renal function / anti-Xa / weight",sideEffect:"Bleeding / HIT / injection site bruising",controlled:"No"},
+  "Fondaparinux":{drugClass:"Synthetic Factor Xa Inhibitor",subClass:"Anticoagulant",mechanism:"Selective indirect Factor Xa inhibition via antithrombin",indication:"VTE prophylaxis / ACS",route:"Subcutaneous",monitoring:"Renal function / bleeding (no antidote)",sideEffect:"Bleeding / injection site reaction",controlled:"No"},
+  "Heparin":{drugClass:"Unfractionated Heparin",subClass:"Anticoagulant",mechanism:"Factor Xa and IIa inhibition via antithrombin (broad)",indication:"ACS / VTE / dialysis / cardiac surgery",route:"IV / SC",monitoring:"APTT / platelets (HIT) / anti-Xa",sideEffect:"Bleeding / HIT / osteoporosis (long-term)",controlled:"No"},
+  "Edoxaban":{drugClass:"Direct Oral Anticoagulant",subClass:"Anticoagulant",mechanism:"Direct Factor Xa inhibition",indication:"AF / VTE treatment",route:"Oral",monitoring:"Renal function / bleeding",sideEffect:"Bleeding / anaemia / GI",controlled:"No"},
+  "Prasugrel":{drugClass:"P2Y12 Inhibitor",subClass:"Antiplatelet",mechanism:"ADP receptor (P2Y12) irreversible blockade (active drug — no CYP needed)",indication:"ACS / Post-PCI (higher potency than clopidogrel)",route:"Oral",monitoring:"Bleeding / weight / age / stroke history",sideEffect:"Bleeding (higher than clopidogrel) / bruising",controlled:"No"},
+  "Ticagrelor":{drugClass:"P2Y12 Inhibitor",subClass:"Antiplatelet",mechanism:"ADP receptor (P2Y12) reversible blockade",indication:"ACS / Post-MI / High-risk atherosclerosis",route:"Oral",monitoring:"Bleeding / dyspnoea / renal",sideEffect:"Dyspnoea / bleeding / bradycardia",controlled:"No"},
+  "Dipyridamole":{drugClass:"Antiplatelet",subClass:"Antiplatelet",mechanism:"Phosphodiesterase inhibition / adenosine uptake inhibition",indication:"Secondary stroke prevention (with aspirin)",route:"Oral",monitoring:"Headache / interactions / cardiac stress test",sideEffect:"Headache / flushing / GI / angina",controlled:"No"},
+  "Flecainide":{drugClass:"Class Ic Antiarrhythmic",subClass:"Antiarrhythmic",mechanism:"Fast Na+ channel blockade",indication:"AF / SVT / ventricular arrhythmias",route:"Oral / IV",monitoring:"ECG / QRS / structural heart disease CI",sideEffect:"Pro-arrhythmic / visual / CNS",controlled:"No"},
+  "Sotalol":{drugClass:"Class III Antiarrhythmic",subClass:"Antiarrhythmic",mechanism:"K+ channel blockade + non-selective beta blockade",indication:"AF / ventricular arrhythmias",route:"Oral",monitoring:"QTc / renal / electrolytes / HR",sideEffect:"QT prolongation / Torsades / bradycardia / fatigue",controlled:"No"},
+  "Adenosine":{drugClass:"Purine Nucleoside",subClass:"Antiarrhythmic",mechanism:"A1 receptor agonism / AV node conduction slowing",indication:"SVT termination / cardiac stress testing",route:"IV (rapid bolus)",monitoring:"ECG / continuous monitoring / asthma CI",sideEffect:"Transient chest tightness / flushing / bronchospasm",controlled:"No"},
+  "Ivabradine":{drugClass:"If Channel Blocker",subClass:"Antiarrhythmic",mechanism:"Funny current (If) inhibition / reduces sinus rate",indication:"HFrEF (with beta-blocker) / stable angina",route:"Oral",monitoring:"HR / visual disturbances (phosphenes)",sideEffect:"Bradycardia / visual phosphenes / AF",controlled:"No"},
+  "Nicorandil":{drugClass:"Potassium Channel Activator",subClass:"Antianginal",mechanism:"K+ channel opening + nitrate-like vasodilation",indication:"Angina (refractory)",route:"Oral",monitoring:"Ulceration risk / hypotension",sideEffect:"Headache / flushing / GI ulceration",controlled:"No"},
+  "Isosorbide Mononitrate":{drugClass:"Nitrate",subClass:"Antianginal",mechanism:"NO release / venodilation / reduces preload",indication:"Angina prophylaxis / HF",route:"Oral",monitoring:"Tolerance (nitrate-free period) / hypotension",sideEffect:"Headache / flushing / hypotension / tolerance",controlled:"No"},
+  "Glyceryl Trinitrate":{drugClass:"Nitrate",subClass:"Antianginal",mechanism:"NO release / venodilation / reduces preload",indication:"Acute angina / HF / hypertensive emergency",route:"Sublingual / Spray / Transdermal / IV",monitoring:"Hypotension / tolerance / headache",sideEffect:"Headache / flushing / hypotension / tolerance",controlled:"No"},
+  "Sacubitril-Valsartan":{drugClass:"ARNI",subClass:"Antihypertensive",mechanism:"Neprilysin inhibition + AT1 receptor blockade",indication:"HFrEF (replacing ACE inhibitor/ARB)",route:"Oral",monitoring:"K+ / Cr / BP / angioedema (washout from ACEi)",sideEffect:"Hypotension / hyperkalaemia / angioedema",controlled:"No"},
+  "Propylthiouracil":{drugClass:"Thionamide",subClass:"Thyroid Agent",mechanism:"Thyroid peroxidase inhibition + peripheral T4 to T3 conversion",indication:"Hyperthyroidism / Graves' (first trimester pregnancy)",route:"Oral",monitoring:"FBC (agranulocytosis) / LFTs / TFTs",sideEffect:"Agranulocytosis / hepatotoxicity / vasculitis",controlled:"No"},
+  "Hydrocortisone":{drugClass:"Corticosteroid",subClass:"Anti-inflammatory",mechanism:"Glucocorticoid + mineralocorticoid receptor agonism",indication:"Adrenal insufficiency / allergic reactions / shock",route:"Oral / IV / IM / Topical",monitoring:"Glucose / BP / electrolytes / adrenal",sideEffect:"Hyperglycaemia / fluid retention / immunosuppression",controlled:"No"},
+  "Fludrocortisone":{drugClass:"Mineralocorticoid",subClass:"Endocrine Agent",mechanism:"Mineralocorticoid receptor agonism / Na+ retention",indication:"Addison's disease / postural hypotension",route:"Oral",monitoring:"BP / K+ / oedema / weight",sideEffect:"Hypertension / hypokalaemia / oedema",controlled:"No"},
+  "Febuxostat":{drugClass:"Xanthine Oxidase Inhibitor",subClass:"Gout Agent",mechanism:"Non-purine xanthine oxidase inhibition",indication:"Gout prophylaxis / hyperuricaemia (allopurinol intolerant)",route:"Oral",monitoring:"Uric acid / CV events / LFTs",sideEffect:"GI / LFT elevation / CV events (warning)",controlled:"No"},
+  "Rasburicase":{drugClass:"Uricase Enzyme",subClass:"Gout Agent",mechanism:"Enzymatic uric acid oxidation to allantoin",indication:"Tumour lysis syndrome / acute hyperuricaemia",route:"IV",monitoring:"G6PD deficiency (haemolysis risk) / uric acid",sideEffect:"Haemolysis (G6PD deficiency) / allergic reactions / methaemoglobinaemia",controlled:"No"},
+  "Risedronate":{drugClass:"Bisphosphonate",subClass:"Bone Agent",mechanism:"Osteoclast inhibition / farnesyl pyrophosphate synthase",indication:"Osteoporosis / Paget's disease",route:"Oral",monitoring:"Dental / oesophageal / Ca2+ / Vit D",sideEffect:"Oesophagitis / ONJ / atypical fractures",controlled:"No"},
+  "Zoledronic Acid":{drugClass:"Bisphosphonate",subClass:"Bone Agent",mechanism:"Osteoclast inhibition (most potent bisphosphonate)",indication:"Osteoporosis / bone metastases / hypercalcaemia",route:"IV",monitoring:"Renal / Ca2+ / Mg2+ / ONJ / dental",sideEffect:"Flu-like reaction / ONJ / renal toxicity / hypocalcaemia",controlled:"No"},
+  "Denosumab":{drugClass:"RANK-L Inhibitor",subClass:"Bone Agent",mechanism:"Anti-RANK-L monoclonal antibody / osteoclast inhibition",indication:"Osteoporosis / bone metastases / giant cell tumour",route:"Subcutaneous",monitoring:"Ca2+ / dental / infections / ONJ",sideEffect:"Hypocalcaemia / ONJ / infections / rebound fracture on stopping",controlled:"No"},
+  "Hydroxychloroquine":{drugClass:"DMARD",subClass:"Immunosuppressant",mechanism:"Lysosomal pH alteration / toll-like receptor inhibition",indication:"RA / SLE / malaria prophylaxis",route:"Oral",monitoring:"Eye exam (retinopathy) / FBC / G6PD",sideEffect:"Retinopathy / GI / skin pigmentation",controlled:"No"},
+  "Sulfasalazine":{drugClass:"DMARD / Aminosalicylate",subClass:"Immunosuppressant",mechanism:"Folate antagonism / anti-inflammatory (multiple)",indication:"RA / IBD / ankylosing spondylitis",route:"Oral",monitoring:"FBC / LFTs / renal / G6PD",sideEffect:"GI / blood dyscrasias / hepatotoxicity / rash",controlled:"No"},
+  "Leflunomide":{drugClass:"DMARD",subClass:"Immunosuppressant",mechanism:"Dihydroorotate dehydrogenase inhibition / pyrimidine synthesis",indication:"RA / psoriatic arthritis",route:"Oral",monitoring:"LFTs / FBC / BP / teratogenicity",sideEffect:"Hepatotoxicity / teratogenic / hypertension / GI",controlled:"No"},
+  "Ferrous Fumarate":{drugClass:"Iron Supplement",subClass:"Haematinic",mechanism:"Iron replacement / haemoglobin synthesis",indication:"Iron deficiency anaemia",route:"Oral",monitoring:"FBC / ferritin / GI tolerance",sideEffect:"GI: nausea / constipation / black stools",controlled:"No"},
+  "Vitamin B12":{drugClass:"Vitamin B supplement",subClass:"Haematinic",mechanism:"Cobalamin replacement / DNA synthesis / myelin",indication:"B12 deficiency / pernicious anaemia",route:"IM / Oral (high dose)",monitoring:"FBC / B12 levels / folate",sideEffect:"Injection site pain / hypokalaemia on treatment initiation",controlled:"No"},
+  "Cholecalciferol":{drugClass:"Vitamin D Supplement",subClass:"Bone Agent",mechanism:"Vitamin D3 / Ca2+ absorption / bone mineralisation",indication:"Vitamin D deficiency / osteoporosis prevention",route:"Oral",monitoring:"25-OH Vit D / Ca2+ / PTH",sideEffect:"Hypercalcaemia (excess) / GI",controlled:"No"},
+  "Calcium Carbonate":{drugClass:"Calcium Supplement",subClass:"Bone Agent",mechanism:"Calcium replacement / bone mineralisation / phosphate binding",indication:"Osteoporosis / hypocalcaemia / renal phosphate binding",route:"Oral",monitoring:"Ca2+ / renal stones / interactions",sideEffect:"Constipation / GI / milk-alkali syndrome (excess)",controlled:"No"}
+
+};
+
+// ================================================================
+// GAME CONSTANTS
+// ================================================================
+// ================================================================
+// DAILY PUZZLE
+// ================================================================
+function getTodayIndex(){
+  try{
+    const d=new Date();
+    const epoch=new Date(Date.UTC(2025,0,1));
+    const ms=Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate())-epoch;
+    const idx=Math.floor(ms/(1000*60*60*24))%PUZZLES.length;
+    return idx>=0?idx:0;
+  }catch(e){return 0;}
+}
+function getTodayKey(){
+  const d=new Date();
+  return `pharmle_${d.getUTCFullYear()}_${d.getUTCMonth()}_${d.getUTCDate()}`;
+}
+
+// ================================================================
+// STATS
+// ================================================================
+function loadStats(){try{return JSON.parse(localStorage.getItem('pharmle_stats'))||{streak:0,maxStreak:0,solved:0,played:0};}catch(e){return{streak:0,maxStreak:0,solved:0,played:0};}}
+function saveStats(s){try{localStorage.setItem('pharmle_stats',JSON.stringify(s));}catch(e){}}
+function saveDayState(s){try{localStorage.setItem(getTodayKey(),JSON.stringify(s));}catch(e){}}
+
+// ================================================================
+// GAME STATE
+// ================================================================
+let cur,guesses=[],over=false,stats;
+
+function init(){
+  try{
+    stats=loadStats();
+    const idx=getTodayIndex();
+    cur=PUZZLES[idx];
+    document.getElementById('daily-badge').textContent='Case #'+(idx+1);
+    let dayState=null;
+    try{
+      const raw=localStorage.getItem(getTodayKey());
+      if(raw){const parsed=JSON.parse(raw);if(parsed&&Array.isArray(parsed.guesses))dayState=parsed;}
+    }catch(e){dayState=null;}
+    if(dayState){
+      guesses=dayState.guesses||[];
+      over=dayState.over||false;
+      renderPatientCard();
+      buildRows();
+      guesses.forEach((_,i)=>{try{renderGuessRow(i,guesses[i]);}catch(e){}});
+      document.getElementById('clue-area').innerHTML='';
+      for(let i=0;i<guesses.length;i++) addClue(i);
+      document.getElementById('pf').style.width=Math.round((guesses.length/MAX_GUESSES)*100)+'%';
+      if(over){showResult(dayState.won);document.getElementById('input-row').style.display='none';startCountdown();}
+    } else {
+      guesses=[];over=false;
+      renderPatientCard();
+      buildRows();
+    }
+    updateHdrStats();
+    buildSelect();
+    if(over) document.getElementById('input-row').style.display='none';
+  }catch(e){
+    console.error('Init error:',e);
+    try{localStorage.clear();}catch(ex){}
+    guesses=[];over=false;
+    cur=PUZZLES[getTodayIndex()];
+    renderPatientCard();
+    buildRows();
+    buildSelect();
+  }
+}
+
+function renderPatientCard(){
+  const m=cur.meta;
+  document.getElementById('pc-meta').innerHTML=
+    `<span class="pc-badge rx">${cur.drug.replace(/./g,'?')}</span><span class="pc-badge">${m.age}</span><span class="pc-badge">${m.condition}</span><span class="pc-badge">${m.route}</span>`;
+  document.getElementById('pc-sc').textContent=cur.scenario;
+  document.getElementById('pc-findings').innerHTML=cur.findings.map(f=>`<span class="finding">${f}</span>`).join('');
+}
+
+function buildRows(){
+  const area=document.getElementById('guess-area');
+  area.innerHTML='';
+  for(let i=0;i<MAX_GUESSES;i++){
+    const row=document.createElement('div');
+    row.className='guess-row';
+    row.innerHTML=`<div class="gnum">${i+1}</div>`+
+      TILE_LABELS.map((_,j)=>`<div class="tile lbl" id="t${i}_${j}">${TILE_LABELS[j]}</div>`).join('');
+    area.appendChild(row);
+  }
+}
+
+function renderGuessRow(i,g){
+  for(let j=0;j<8;j++){
+    const el=document.getElementById(`t${i}_${j}`);
+    if(!el) continue;
+    const gv=g.meta[META_KEYS[j]]||'';
+    const av=cur.meta[META_KEYS[j]]||'';
+    el.textContent=gv;
+    el.className='tile '+tileClass(META_KEYS[j],gv,av);
+  }
+}
+
+function tileClass(key,gv,av){
+  if(gv===av) return'correct';
+  if(key==='drugClass'){
+    const families=[
+      ["ACE Inhibitor","ARB"],
+      ["Beta Blocker"],
+      ["SSRI","SNRI","Tricyclic Antidepressant","NaSSA"],
+      ["Penicillin","Cephalosporin","Carbapenem"],
+      ["Statin"],
+      ["Loop Diuretic","Thiazide Diuretic","Potassium-sparing Diuretic"],
+      ["Proton Pump Inhibitor"],
+      ["Opioid"],
+      ["Benzodiazepine"],
+      ["SABA","LABA"],
+      ["Direct Oral Anticoagulant","Low Molecular Weight Heparin","Vitamin K Antagonist"],
+      ["Azole Antifungal"],
+      ["Gabapentinoid"],
+      ["Long-acting Insulin","Rapid-acting Insulin"],
+      ["Sulphonylurea"],
+      ["Macrolide"],
+      ["Fluoroquinolone"],
+      ["Calcium Channel Blocker"],
+      ["Sodium Channel Blocker"]
+    ];
+    for(const f of families) if(f.includes(gv)&&f.includes(av)) return'partial';
+  }
+  if(key==='controlled'){
+    if(gv.startsWith('Yes')&&av.startsWith('Yes')) return'close';
+  }
+  if(key==='route'){
+    const oral=["Oral"];
+    const inhaled=["Inhaled"];
+    const inject=["Subcutaneous","IV","IM","IV / IM","Subcutaneous / Oral","IV / Oral","Oral / IV","Oral / IV / SC","Oral / SC","Oral / IV / PR","IV / PR / Buccal","IV / SC"];
+    if(oral.some(r=>gv.includes(r))&&oral.some(r=>av.includes(r))) return'close';
+    if(inject.some(r=>gv.includes(r))&&inject.some(r=>av.includes(r))) return'close';
+  }
+  return'wrong';
+}
+
+function addClue(attempt){
+  const clue=cur.clues[attempt];
+  if(!clue) return;
+  const area=document.getElementById('clue-area');
+  const d=document.createElement('div');
+  d.className='clue';
+  d.innerHTML=`<span class="clue-arr">▶</span><span class="clue-txt">${clue}</span>`;
+  area.appendChild(d);
+}
+
+function buildSelect(){
+  const sel=document.getElementById('ds');
+  const used=guesses.map(g=>g.dx);
+  const opts=ALL_DRUGS.filter(d=>!used.includes(d)).sort();
+  sel.innerHTML='<option value="">— Identify the drug —</option>'+
+    opts.map(d=>`<option value="${d}">${d}</option>`).join('');
+  document.getElementById('go').disabled=false;
+}
+
+function submitGuess(){
+  if(over) return;
+  const sel=document.getElementById('ds');
+  const val=sel.value;
+  if(!val) return;
+  const matchedPuzzle=PUZZLES.find(p=>p.drug===val);
+  const meta=matchedPuzzle?matchedPuzzle.meta:META_DB[val]||{drugClass:'Unknown',subClass:'Unknown',mechanism:'Unknown',indication:'Unknown',route:'Unknown',monitoring:'Unknown',sideEffect:'Unknown',controlled:'Unknown'};
+  guesses.push({dx:val,meta});
+  renderGuessRow(guesses.length-1,guesses[guesses.length-1]);
+  document.getElementById('pf').style.width=Math.round((guesses.length/MAX_GUESSES)*100)+'%';
+  const won=val===cur.drug;
+  if(!won) addClue(guesses.length-1);
+  if(won||guesses.length>=MAX_GUESSES){
+    over=true;
+    stats.played++;
+    if(won){stats.solved++;stats.streak++;stats.maxStreak=Math.max(stats.maxStreak,stats.streak);}
+    else{stats.streak=0;}
+    saveStats(stats);
+    saveDayState({guesses,over:true,won});
+    updateHdrStats();
+    showResult(won);
+    document.getElementById('input-row').style.display='none';
+    startCountdown();
+  } else {
+    saveDayState({guesses,over:false,won:false});
+    buildSelect();
+  }
+  sel.value='';
+}
+
+function showResult(won){
+  document.getElementById('pf').style.width='100%';
+  document.getElementById('pf').style.background=won?'#86efac':'#fda4af';
+  const res=document.getElementById('result');
+  const n=guesses.length;
+  if(won){
+    res.className='result win';
+    document.getElementById('rt').textContent=n===1?'Perfect Diagnosis!':n<=2?'Excellent — '+n+' guesses':n<=4?'Dispensed in '+n:n+' guesses — got there!';
+    document.getElementById('ra').innerHTML=`<b>${cur.drug}</b> — ${cur.meta.drugClass}<br><span style="font-size:12px">${cur.meta.indication}</span>`;
+  } else {
+    res.className='result lose';
+    document.getElementById('rt').textContent='Case Unsolved';
+    document.getElementById('ra').innerHTML=`Today's drug: <b>${cur.drug}</b><br><span style="font-size:12px">${cur.meta.drugClass} — ${cur.meta.indication}</span>`;
+  }
+}
+
+function buildEmojiGrid(){
+  const won=guesses.some(g=>g.dx===cur.drug);
+  const lines=[`PharmleRx #${getTodayIndex()+1} ${won?guesses.length:'X'}/${MAX_GUESSES}`,''];
+  guesses.forEach(g=>{
+    let row='';
+    META_KEYS.forEach((key)=>{
+      const gv=g.meta[key]||'';
+      const av=cur.meta[key]||'';
+      const cls=tileClass(key,gv,av);
+      row+={correct:'🟩',close:'🟨',partial:'🟦',wrong:'🟥'}[cls]||'⬛';
+    });
+    lines.push(row);
+  });
+  lines.push('','pharmle.com');
+  return lines.join('\n');
+}
+
+function share(){
+  const text=buildEmojiGrid();
+  if(navigator.share){navigator.share({title:'PharmleRx',text}).catch(()=>copyToClipboard(text));}
+  else{copyToClipboard(text);}
+}
+
+function copyToClipboard(text){
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('share-btn');
+    btn.textContent='Copied!';
+    btn.className='share-btn copied';
+    setTimeout(()=>{btn.textContent='Share Result';btn.className='share-btn';},2500);
+    showToast('Result copied to clipboard!');
+  }).catch(()=>showToast('Could not copy — try manually'));
+}
+
+function startCountdown(){tick();setInterval(tick,1000);}
+function tick(){
+  const now=new Date();
+  const next=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()+1));
+  const diff=next-now;
+  const h=String(Math.floor(diff/3600000)).padStart(2,'0');
+  const m=String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+  const s=String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+  const el=document.getElementById('countdown');
+  if(el) el.textContent=`${h}:${m}:${s}`;
+}
+
+function openModal(id){if(id==='stats')renderStatsModal();document.getElementById('modal-'+id).classList.add('open');}
+function closeModal(id){document.getElementById('modal-'+id).classList.remove('open');}
+document.querySelectorAll('.modal-bg').forEach(el=>{el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});});
+
+function renderStatsModal(){
+  const s=loadStats();
+  const winPct=s.played?Math.round((s.solved/s.played)*100):0;
+  document.getElementById('stats-grid').innerHTML=
+    statCard(s.played,'Played')+statCard(winPct+'%','Win %')+statCard(s.streak,'Streak')+statCard(s.maxStreak,'Best');
+}
+function statCard(val,label){
+  return `<div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:12px;text-align:center">
+    <div style="font-family:'DM Serif Display',serif;font-size:28px;color:#0891b2">${val}</div>
+    <div style="font-size:11px;color:#94a3b8;letter-spacing:.5px;margin-top:4px;text-transform:uppercase">${label}</div>
+  </div>`;
+}
+
+function updateHdrStats(){
+  const s=loadStats();
+  document.getElementById('st').textContent=s.streak;
+  document.getElementById('sv').textContent=s.solved;
+  document.getElementById('bst').textContent=s.maxStreak||'—';
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+if(!localStorage.getItem('pharmle_visited')){
+  localStorage.setItem('pharmle_visited','1');
+  setTimeout(()=>openModal('how'),600);
+}
+
+init();
+</script>
+</body>
+</html>
